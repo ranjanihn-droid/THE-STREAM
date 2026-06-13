@@ -38,34 +38,38 @@ const getOneDriveDirectUrl = (sharingUrl: string) => {
 
 export default function GalleryView() {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [resolvedUrls, setResolvedUrls] = useState<Record<string, string>>({});
+  const [resolvedUrls, setResolvedUrls] = useState<Record<string, string>>(() => {
+    // Pre-populate with synchronous client-side direct URLs so the gallery loads instantly
+    const initial: Record<string, string> = {};
+    GALLERY_ITEMS.forEach(item => {
+      initial[item.imageSrc] = getOneDriveDirectUrl(item.imageSrc);
+    });
+    return initial;
+  });
   const [loadingItems, setLoadingItems] = useState<Record<string, boolean>>({});
 
-  // Resolve OneDrive shortlinks to direct streamable / download urls on mount
+  // Lazily resolve short links or keep the direct client-side mapping
   useEffect(() => {
     GALLERY_ITEMS.forEach((item) => {
       const original = item.imageSrc;
       if (!original.startsWith("http") || original.includes("onedrive.live.com")) {
-        setResolvedUrls(prev => ({ ...prev, [original]: original }));
         return;
       }
 
-      setLoadingItems(prev => ({ ...prev, [original]: true }));
+      // Check if we need to refine the url (e.g. for video iframe formats)
       fetch(`/api/resolve-onedrive?url=${encodeURIComponent(original)}`)
         .then(res => {
           if (!res.ok) throw new Error("Failed to resolve URL");
           return res.json();
         })
         .then(data => {
-          setResolvedUrls(prev => ({ ...prev, [original]: data.resolvedUrl }));
+          if (data.resolvedUrl) {
+            setResolvedUrls(prev => ({ ...prev, [original]: data.resolvedUrl }));
+          }
         })
         .catch(err => {
-          console.error("Error resolving OneDrive item:", original, err);
-          // Fallback to legacy btoa encoding
-          setResolvedUrls(prev => ({ ...prev, [original]: getOneDriveDirectUrl(original) }));
-        })
-        .finally(() => {
-          setLoadingItems(prev => ({ ...prev, [original]: false }));
+          console.warn("Lazy resolution error for:", original, err.message);
+          // If the API fails, we already have our trusty getOneDriveDirectUrl mapped!
         });
     });
   }, []);
@@ -234,14 +238,26 @@ export default function GalleryView() {
                       </div>
                     </div>
                   ) : activeItem.mediaType === "video" ? (
-                    <div className="absolute inset-0 w-full h-full bg-stone-900 flex items-center justify-center">
-                      <iframe 
-                        src={resolvedUrls[activeItem.imageSrc]} 
-                        className="w-full h-full border-0 absolute inset-0"
-                        scrolling="no" 
-                        allowFullScreen
-                        title={activeItem.title}
-                      ></iframe>
+                    <div className="absolute inset-0 w-full h-full bg-stone-950 flex items-center justify-center p-1">
+                      {resolvedUrls[activeItem.imageSrc]?.includes("embed") ? (
+                        <iframe 
+                          src={resolvedUrls[activeItem.imageSrc]} 
+                          className="w-full h-full border-0 absolute inset-0"
+                          scrolling="no" 
+                          allowFullScreen
+                          title={activeItem.title}
+                        ></iframe>
+                      ) : (
+                        <video 
+                          key={activeItem.imageSrc}
+                          src={resolvedUrls[activeItem.imageSrc]} 
+                          className="max-w-full max-h-full rounded-xl shadow-lg focus:outline-none"
+                          controls
+                          playsInline
+                          preload="metadata"
+                          title={activeItem.title}
+                        />
+                      )}
                     </div>
                   ) : (
                     <motion.img

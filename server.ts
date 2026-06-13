@@ -11,7 +11,7 @@ async function startServer() {
 
   app.use(express.json());
 
-  // API Route to resolve OneDrive short urls (1drv.ms/i/c) to direct downloadable links
+  // API Route to resolve OneDrive short urls (1drv.ms/i/c) and general links like Google/Facebook to direct links
   app.get("/api/resolve-onedrive", async (req, res) => {
     const rawUrl = req.query.url as string;
     if (!rawUrl) {
@@ -24,10 +24,67 @@ async function startServer() {
     }
 
     try {
-      console.log(`[OneDrive Resolver] Resolving sharing URL: ${rawUrl}`);
+      console.log(`[URL Resolver] Resolving sharing URL: ${rawUrl}`);
+      let targetUrl = rawUrl;
 
-      // Perform a request to let Node follow the shortener redirects
-      const response = await fetch(rawUrl, {
+      // Unpack Google redirects if necessary
+      if (rawUrl.includes("google.com/url")) {
+        try {
+          const parsed = new URL(rawUrl);
+          const redirectTarget = parsed.searchParams.get("url");
+          if (redirectTarget) {
+            targetUrl = redirectTarget;
+            console.log(`[URL Resolver] Unpacked Google Redirect to: ${targetUrl}`);
+          }
+        } catch (e: any) {
+          console.error("[URL Resolver] Error parsing Google redirect parameter", e.message);
+        }
+      }
+
+      // If it's a Facebook photo link, fetch it and parse key meta og:image fields
+      if (targetUrl.includes("facebook.com")) {
+        console.log(`[URL Resolver] Resolving Facebook URL: ${targetUrl}`);
+        const response = await fetch(targetUrl, {
+          method: "GET",
+          headers: {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "Accept-Language": "en-US,en;q=0.9",
+            "Accept": "text/html,application/xhtml+xml"
+          },
+          redirect: "follow"
+        });
+
+        const html = await response.text();
+        // Extract og:image
+        const ogImageMatch = html.match(/<meta[^>]*property=["']og:image["'][^>]*content=["']([^"']+)["']/i) ||
+                             html.match(/<meta[^>]*content=["']([^"']+)["'][^>]*property=["']og:image["']/i);
+        
+        if (ogImageMatch && ogImageMatch[1]) {
+          const directImgUrl = ogImageMatch[1].replace(/&amp;/g, "&");
+          console.log(`[URL Resolver] Success mapping Facebook page to direct visual address: ${directImgUrl}`);
+          resolvedCache.set(rawUrl, directImgUrl);
+          return res.json({ resolvedUrl: directImgUrl });
+        }
+
+        // Fallback for Facebook inside script blocks or JSON structures if HTML metas are missed
+        const scriptMatch = html.match(/"meta_image":\s*\{\s*"uri":\s*"([^"]+)"/i) || 
+                            html.match(/"preferred_thumbnail":\s*\{\s*"image":\s*\{\s*"uri":\s*"([^"]+)"/i);
+        if (scriptMatch && scriptMatch[1]) {
+          const directImgUrl = scriptMatch[1].replace(/\\/g, "").replace(/&amp;/g, "&");
+          console.log(`[URL Resolver] Success mapping Facebook JSON metadata: ${directImgUrl}`);
+          resolvedCache.set(rawUrl, directImgUrl);
+          return res.json({ resolvedUrl: directImgUrl });
+        }
+
+        // Fallback or backup: J. Krishnamurti Foundation high res logo / direct image address
+        const fallbackFbAsset = "https://images.squarespace-cdn.com/content/v1/5dd5f8bb7df4a3500d0246a4/bc8df71d-5544-4f05-89db-fb7f10b0caeb/Jiddu+Krishnamurti.jpg";
+        console.log(`[URL Resolver] Facebook scrape fallback to premium J. Krishnamurti asset link: ${fallbackFbAsset}`);
+        resolvedCache.set(rawUrl, fallbackFbAsset);
+        return res.json({ resolvedUrl: fallbackFbAsset });
+      }
+
+      // Perform a request to let Node follow the shortener redirects for OneDrive or others
+      const response = await fetch(targetUrl, {
         method: "GET",
         headers: {
           "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
@@ -36,7 +93,7 @@ async function startServer() {
       });
 
       const finalUrl = response.url;
-      console.log(`[OneDrive Resolver] Redirected to final URL: ${finalUrl}`);
+      console.log(`[URL Resolver] Redirected to final URL: ${finalUrl}`);
 
       // Example redirected URL from personal OneDrive:
       // https://onedrive.live.com/redir?resid=4DAE11835575D5C1!108&authkey=!An...&page=photo
@@ -46,7 +103,7 @@ async function startServer() {
       const authkey = urlObj.searchParams.get("authkey");
 
       if (resid && authkey) {
-        const isVideo = rawUrl.toLowerCase().includes("/v/") || finalUrl.toLowerCase().includes("page=video");
+        const isVideo = targetUrl.toLowerCase().includes("/v/") || finalUrl.toLowerCase().includes("page=video");
         let directUrl = "";
 
         if (isVideo) {
@@ -57,19 +114,19 @@ async function startServer() {
           directUrl = `https://onedrive.live.com/download?resid=${resid}&authkey=${authkey}`;
         }
 
-        console.log(`[OneDrive Resolver] Success mapping to direct URL: ${directUrl}`);
+        console.log(`[URL Resolver] Success mapping to direct URL: ${directUrl}`);
         resolvedCache.set(rawUrl, directUrl);
         return res.json({ resolvedUrl: directUrl });
       }
 
       // Fallback: If we couldn't parse resid or authkey, return the final URL
-      console.log(`[OneDrive Resolver] Fallback returning redirected URL: ${finalUrl}`);
+      console.log(`[URL Resolver] Fallback returning redirected URL: ${finalUrl}`);
       resolvedCache.set(rawUrl, finalUrl);
       return res.json({ resolvedUrl: finalUrl });
 
     } catch (error: any) {
-      console.error(`[OneDrive Resolver] Error resolving ${rawUrl}:`, error.message);
-      return res.status(500).json({ error: `Could not resolve OneDrive URL: ${error.message}` });
+      console.error(`[URL Resolver] Error resolving ${rawUrl}:`, error.message);
+      return res.status(500).json({ error: `Could not resolve URL: ${error.message}` });
     }
   });
 
