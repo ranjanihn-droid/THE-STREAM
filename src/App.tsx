@@ -5,6 +5,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
+import { Analytics } from "@vercel/analytics/react";
 import Navbar from "./components/Navbar";
 import HomeView from "./components/HomeView";
 import AboutView from "./components/AboutView";
@@ -102,6 +103,9 @@ export default function App() {
 
       {/* 🪵 Anchor Footer */}
       <Footer setActiveTab={handleSetActiveTab} />
+      
+      {/* Vercel Web Analytics */}
+      <Analytics />
     </div>
   );
 }
