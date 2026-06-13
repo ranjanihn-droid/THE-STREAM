@@ -42,7 +42,7 @@ async function startServer() {
       // https://onedrive.live.com/redir?resid=4DAE11835575D5C1!108&authkey=!An...&page=photo
       // We parse the URL search parameters to get resid and authkey
       const urlObj = new URL(finalUrl);
-      const resid = urlObj.searchParams.get("resid");
+      let resid = urlObj.searchParams.get("resid") || urlObj.searchParams.get("id");
       const authkey = urlObj.searchParams.get("authkey");
 
       if (resid && authkey) {

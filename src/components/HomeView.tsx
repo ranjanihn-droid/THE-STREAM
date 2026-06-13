@@ -1,4 +1,5 @@
-import { ArrowRight, Sprout, HeartHandshake } from "lucide-react";
+import { useState, useEffect } from "react";
+import { ArrowRight, Sprout, HeartHandshake, Aperture } from "lucide-react";
 import { HOME_INTRO, IMAGES } from "../data";
 import { motion } from "motion/react";
 import StreamLogo from "./StreamLogo";
@@ -8,6 +9,39 @@ interface HomeViewProps {
 }
 
 export default function HomeView({ onExplorePrograms }: HomeViewProps) {
+  const [resolvedImageUrl, setResolvedImageUrl] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const originalUrl = "https://1drv.ms/u/c/4dae11835575d5c1/IQTGfBm9w_6VSbqw4z63RcHkAfslr44LZofupMWjxh4chAc";
+    
+    setIsLoading(true);
+    fetch(`/api/resolve-onedrive?url=${encodeURIComponent(originalUrl)}`)
+      .then(res => {
+        if (!res.ok) throw new Error("Failed to resolve URL via API");
+        return res.json();
+      })
+      .then(data => {
+        setResolvedImageUrl(data.resolvedUrl);
+      })
+      .catch(err => {
+        console.error("HomeView: Error resolving via API:", err);
+        // Fallback to client-side btoa conversion
+        try {
+          const base64 = btoa(originalUrl)
+            .replace(/\+/g, "-")
+            .replace(/\//g, "_")
+            .replace(/=+$/, "");
+          setResolvedImageUrl(`https://api.onedrive.com/v1.0/shares/u!${base64}/root/content`);
+        } catch (e) {
+          setResolvedImageUrl(originalUrl);
+        }
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, []);
+
   return (
     <div className="flex flex-col min-h-screen bg-white">
       
@@ -21,15 +55,21 @@ export default function HomeView({ onExplorePrograms }: HomeViewProps) {
           {/* 🧘 J. Krishnamurti Inspiration Layout (Side-by-Side as inspired by the uploaded image) */}
           <div className="w-full bg-white grid grid-cols-1 lg:grid-cols-12 mb-6 gap-8 lg:gap-12">
             
-            {/* Left side: Originally Uploaded Image embedded directly from OneDrive */}
-            <div className="lg:col-span-5 relative min-h-[410px] lg:min-h-[580px] bg-white overflow-hidden flex items-stretch">
-              <iframe 
-                src="https://1drv.ms/u/c/4dae11835575d5c1/IQTGfBm9w_6VSbqw4z63RcHkAfslr44LZofupMWjxh4chAc" 
-                width="100%" 
-                title="Originally Uploaded Inspiration Image"
-                className="w-full min-h-[410px] lg:min-h-full border-0 select-none bg-transparent"
-                scrolling="no"
-              ></iframe>
+            {/* Left side: Originally Uploaded Image resolved directly from OneDrive */}
+            <div className="lg:col-span-5 relative min-h-[410px] lg:min-h-[580px] bg-stone-50 border border-stone-200/60 rounded-2xl overflow-hidden flex items-center justify-center p-2 shadow-sm.">
+              {isLoading || !resolvedImageUrl ? (
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-stone-50 text-center gap-3">
+                  <Aperture className="w-10 h-10 text-[#F37021] animate-spin-slow" />
+                  <span className="font-mono text-[11px] text-[#7F817F]">Loading Inspiration Plate...</span>
+                </div>
+              ) : (
+                <img 
+                  src={resolvedImageUrl} 
+                  alt="Originally Uploaded Inspiration Image"
+                  referrerPolicy="no-referrer"
+                  className="w-full h-full object-contain rounded-xl select-none select-all-none"
+                />
+              )}
             </div>
 
             {/* Right side: Inspiration Quote and explanation */}
