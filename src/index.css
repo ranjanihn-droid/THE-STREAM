@@ -1,0 +1,45 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-sketch: "Cabin Sketch", cursive;
+  --font-chalk: "Fredericka the Great", cursive;
+  --font-chalkboy: "chalkboy", "Fredericka the Great", cursive;
+  --font-amatic: "Andika", sans-serif;
+  --font-hand: "Patrick Hand", cursive;
+  --font-kalam: "Kalam", cursive;
+
+  --color-slate-bg: #FFFFFF;
+  --color-slate-black: #1A1D1C;
+  --color-canvas-bg: #FFFFFF;
+  --color-chalk-white: #1A1D1C;
+  --color-espresso: #1A1D1C;
+  --color-sage: #F37021;
+  --color-terracotta: #F37021;
+  --color-ochre: #FF9E2A;
+  --color-warm-alabaster: #FAF9F6;
+}
+
+@layer base {
+  body {
+    font-family: var(--font-hand);
+    background-color: var(--color-canvas-bg);
+    color: var(--color-espresso);
+    letter-spacing: 0.025em;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection {
+    background-color: #F37021;
+    color: #FFFFFF;
+  }
+}
+
+/* Custom chalk board sketch styles */
+.chalkboard-text {
+  text-shadow: 0 0 1px rgba(255, 255, 255, 0.4), 0 0 2px rgba(255, 255, 255, 0.2);
+}
+
+.chalkboard-border {
+  border-image: repeating-linear-gradient(45deg, #D9B48F, #D9B48F 10px, #2C302E 10px, #2C302E 20px) 15;
+}
