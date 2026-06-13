@@ -36,6 +36,7 @@ export interface GalleryItem {
   imageSrc: string;
   title: string;
   description: string;
+  mediaType?: "image" | "video";
 }
 
 export interface LeadSubmission {
