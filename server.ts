@@ -73,6 +73,29 @@ async function startServer() {
     }
   });
 
+  // Robots.txt for search engines & AI crawlers
+  app.get("/robots.txt", (req, res) => {
+    res.type("text/plain");
+    res.send(`User-agent: *
+Allow: /
+
+Sitemap: https://www.thestream.co.in/sitemap.xml`);
+  });
+
+  // Sitemap.xml for search engines & AI crawlers
+  app.get("/sitemap.xml", (req, res) => {
+    res.type("application/xml");
+    res.send(`<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://www.thestream.co.in/</loc>
+    <lastmod>2026-06-13</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>`);
+  });
+
   // Health check
   app.get("/api/health", (req, res) => {
     res.json({ status: "ok" });
