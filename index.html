@@ -9,6 +9,27 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <!-- Fonts: Fredericka the Great, Cabin Sketch, Andika, Patrick Hand, Kalam, Inter (fallback/accent) -->
     <link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Cabin+Sketch:wght@400;700&family=Fredericka+the+Great&family=Inter:wght@400;500;600;700&family=Kalam:wght@400;700&family=Patrick+Hand&display=swap" rel="stylesheet" />
+    <!-- Dynamic Favicon Stream Logo -->
+    <script>
+      (function() {
+        try {
+          var sharingUrl = "https://1drv.ms/i/c/4dae11835575d5c1/IQRk2lquIovgQJVv1mzhRRJKAQnA_MsIYtlRS5q5Kkv03Tk";
+          var base64 = btoa(sharingUrl)
+            .replace(/\+/g, "-")
+            .replace(/\//g, "_")
+            .replace(/=+$/, "");
+          var directUrl = "https://api.onedrive.com/v1.0/shares/u!" + base64 + "/root/content";
+          
+          var iconLink = document.createElement('link');
+          iconLink.rel = 'icon';
+          iconLink.type = 'image/png';
+          iconLink.href = directUrl;
+          document.head.appendChild(iconLink);
+        } catch (e) {
+          console.error("Failed to inject stream logo favicon:", e);
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
