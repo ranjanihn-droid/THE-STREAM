@@ -83,46 +83,125 @@ async function startServer() {
         return res.json({ resolvedUrl: fallbackFbAsset });
       }
 
-      // Perform a request to let Node follow the shortener redirects for OneDrive or others
-      const response = await fetch(targetUrl, {
-        method: "GET",
-        headers: {
-          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-        },
-        redirect: "follow"
-      });
+      // Perform a request to let Node manually follow shortener redirects for OneDrive step-by-step.
+      // This is extremely important because OneDrive redir URLs point to a webpage viewer
+      // that strips the vital 'authkey' parameter on final follow, causing direct file downloads to fail.
+      let currentUrl = targetUrl;
+      let hops = 0;
+      const maxHops = 4;
+      let resolvedDirectUrl = "";
 
-      const finalUrl = response.url;
-      console.log(`[URL Resolver] Redirected to final URL: ${finalUrl}`);
+      while (hops < maxHops) {
+        console.log(`[URL Resolver] Hop ${hops}: Fetching headers for ${currentUrl}`);
+        const response = await fetch(currentUrl, {
+          method: "GET",
+          headers: {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+          },
+          redirect: "manual"
+        });
 
-      // Example redirected URL from personal OneDrive:
-      // https://onedrive.live.com/redir?resid=4DAE11835575D5C1!108&authkey=!An...&page=photo
-      // We parse the URL search parameters to get resid and authkey
-      const urlObj = new URL(finalUrl);
-      let resid = urlObj.searchParams.get("resid") || urlObj.searchParams.get("id");
-      const authkey = urlObj.searchParams.get("authkey");
+        const location = response.headers.get("location");
+        console.log(`[URL Resolver] Status: ${response.status}, Location: ${location}`);
 
-      if (resid && authkey) {
-        const isVideo = targetUrl.toLowerCase().includes("/v/") || finalUrl.toLowerCase().includes("page=video");
-        let directUrl = "";
+        if (location) {
+          // Resolve relative redirect against currentUrl
+          const resolvedLocation = new URL(location, currentUrl).toString();
+          console.log(`[URL Resolver] Resolved location: ${resolvedLocation}`);
 
-        if (isVideo) {
-          // Embed format is perfect for iframes and streaming video players
-          directUrl = `https://onedrive.live.com/embed?resid=${resid}&authkey=${authkey}`;
+          // Parse search parameters case-insensitively
+          const urlObj = new URL(resolvedLocation);
+          let resid = "";
+          let authkey = "";
+
+          for (const [key, val] of urlObj.searchParams.entries()) {
+            const lowerK = key.toLowerCase();
+            if (lowerK === "resid" || lowerK === "id") {
+              resid = val;
+            } else if (lowerK === "authkey") {
+              authkey = val;
+            }
+          }
+
+          if (resid && authkey) {
+            console.log(`[URL Resolver] Found resid/id (${resid}) and authkey (${authkey}) in redirects chain!`);
+            resolvedDirectUrl = `https://onedrive.live.com/download?resid=${resid}&authkey=${authkey}`;
+            break;
+          }
+
+          currentUrl = resolvedLocation;
+          hops++;
         } else {
-          // Download format is perfect for normal high-res images in <img> tags
-          directUrl = `https://onedrive.live.com/download?resid=${resid}&authkey=${authkey}`;
-        }
+          // No redirect header. Let's inspect the current URL's parameters
+          try {
+            const urlObj = new URL(currentUrl);
+            let resid = "";
+            let authkey = "";
 
-        console.log(`[URL Resolver] Success mapping to direct URL: ${directUrl}`);
-        resolvedCache.set(rawUrl, directUrl);
-        return res.json({ resolvedUrl: directUrl });
+            for (const [key, val] of urlObj.searchParams.entries()) {
+              const lowerK = key.toLowerCase();
+              if (lowerK === "resid" || lowerK === "id") {
+                resid = val;
+              } else if (lowerK === "authkey") {
+                authkey = val;
+              }
+            }
+
+            if (resid) {
+              console.log(`[URL Resolver] Found resid/id (${resid}) at terminal URL page: ${currentUrl}`);
+              resolvedDirectUrl = `https://onedrive.live.com/download?resid=${resid}${authkey ? `&authkey=${authkey}` : ""}`;
+            }
+          } catch (e) {}
+          break;
+        }
       }
 
-      // Fallback: If we couldn't parse resid or authkey, return the final URL
-      console.log(`[URL Resolver] Fallback returning redirected URL: ${finalUrl}`);
-      resolvedCache.set(rawUrl, finalUrl);
-      return res.json({ resolvedUrl: finalUrl });
+      // Fallback: If we couldn't resolve the redirect to a direct file download link step-by-step,
+      // let's do a follow-redirect fetch to get the final URL as last resort.
+      if (!resolvedDirectUrl) {
+        console.log(`[URL Resolver] Step-by-step resolution did not find resid. Trying full redirection follow...`);
+        const response = await fetch(targetUrl, {
+          method: "GET",
+          headers: {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+          },
+          redirect: "follow"
+        });
+
+        const finalUrl = response.url;
+        console.log(`[URL Resolver] Full follow landed on: ${finalUrl}`);
+
+        try {
+          const urlObj = new URL(finalUrl);
+          let resid = "";
+          let authkey = "";
+
+          for (const [key, val] of urlObj.searchParams.entries()) {
+            const lowerK = key.toLowerCase();
+            if (lowerK === "resid" || lowerK === "id") {
+              resid = val;
+            } else if (lowerK === "authkey") {
+              authkey = val;
+            }
+          }
+
+          if (resid) {
+            resolvedDirectUrl = `https://onedrive.live.com/download?resid=${resid}${authkey ? `&authkey=${authkey}` : ""}`;
+          }
+        } catch (e) {}
+      }
+
+      if (resolvedDirectUrl) {
+        console.log(`[URL Resolver] Mapping SUCCESS! Direct URL: ${resolvedDirectUrl}`);
+        resolvedCache.set(rawUrl, resolvedDirectUrl);
+        return res.json({ resolvedUrl: resolvedDirectUrl });
+      }
+
+      // If we couldn't resolve to a direct downloadable link, we return a 404 or empty response.
+      // Crucial: DO NOT return a webpage viewer URL (like onedrive.live.com/?id=...) as direct URL
+      // because that will crash client-side image display and break fallback direct u! links in the gallery.
+      console.warn(`[URL Resolver] Failed to resolve to a direct downloadable asset URL: ${rawUrl}`);
+      return res.status(404).json({ error: "Could not resolve sharing URL to a direct downloadable file link." });
 
     } catch (error: any) {
       console.error(`[URL Resolver] Error resolving ${rawUrl}:`, error.message);

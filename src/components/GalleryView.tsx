@@ -38,38 +38,45 @@ const getOneDriveDirectUrl = (sharingUrl: string) => {
 
 export default function GalleryView() {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [resolvedUrls, setResolvedUrls] = useState<Record<string, string>>(() => {
-    // Pre-populate with synchronous client-side direct URLs so the gallery loads instantly
-    const initial: Record<string, string> = {};
-    GALLERY_ITEMS.forEach(item => {
-      initial[item.imageSrc] = getOneDriveDirectUrl(item.imageSrc);
+  const [resolvedUrls, setResolvedUrls] = useState<Record<string, string>>({});
+  const [loadingItems, setLoadingItems] = useState<Record<string, boolean>>(() => {
+    const initialLoading: Record<string, boolean> = {};
+    GALLERY_ITEMS.forEach((item) => {
+      initialLoading[item.imageSrc] = true;
     });
-    return initial;
+    return initialLoading;
   });
-  const [loadingItems, setLoadingItems] = useState<Record<string, boolean>>({});
 
-  // Lazily resolve short links or keep the direct client-side mapping
+  // Lazily resolve OneDrive short links to direct download/streaming URLs
   useEffect(() => {
     GALLERY_ITEMS.forEach((item) => {
       const original = item.imageSrc;
-      if (!original.startsWith("http") || original.includes("onedrive.live.com")) {
+      if (!original.startsWith("http")) {
+        setResolvedUrls((prev) => ({ ...prev, [original]: original }));
+        setLoadingItems((prev) => ({ ...prev, [original]: false }));
         return;
       }
 
-      // Check if we need to refine the url (e.g. for video iframe formats)
       fetch(`/api/resolve-onedrive?url=${encodeURIComponent(original)}`)
-        .then(res => {
+        .then((res) => {
           if (!res.ok) throw new Error("Failed to resolve URL");
           return res.json();
         })
-        .then(data => {
+        .then((data) => {
           if (data.resolvedUrl) {
-            setResolvedUrls(prev => ({ ...prev, [original]: data.resolvedUrl }));
+            setResolvedUrls((prev) => ({ ...prev, [original]: data.resolvedUrl }));
+          } else {
+            // Fallback to client-side direct token-link calculation
+            setResolvedUrls((prev) => ({ ...prev, [original]: getOneDriveDirectUrl(original) }));
           }
         })
-        .catch(err => {
+        .catch((err) => {
           console.warn("Lazy resolution error for:", original, err.message);
-          // If the API fails, we already have our trusty getOneDriveDirectUrl mapped!
+          // Fallback to client-side direct token-link calculation
+          setResolvedUrls((prev) => ({ ...prev, [original]: getOneDriveDirectUrl(original) }));
+        })
+        .finally(() => {
+          setLoadingItems((prev) => ({ ...prev, [original]: false }));
         });
     });
   }, []);
