@@ -11,6 +11,55 @@ async function startServer() {
 
   app.use(express.json());
 
+  // Serve favicon or main logo directly from our backend to bypass OneDrive hotlinking/CORS limits
+  app.get(["/api/favicon.png", "/favicon.ico", "/favicon.png"], async (req, res) => {
+    const sharingUrl = "https://1drv.ms/i/c/4dae11835575d5c1/IQRk2lquIovgQJVv1mzhRRJKAQnA_MsIYtlRS5q5Kkv03Tk";
+    
+    // Check if we have a cached direct URL
+    let resolvedUrl = resolvedCache.get(sharingUrl);
+    
+    if (!resolvedUrl) {
+      try {
+        const cleanUrl = sharingUrl.split("?")[0];
+        const base64 = Buffer.from(cleanUrl).toString("base64")
+          .replace(/\+/g, "-")
+          .replace(/\//g, "_")
+          .replace(/=+$/, "");
+        resolvedUrl = `https://api.onedrive.com/v1.0/shares/u!${base64}/root/content`;
+        resolvedCache.set(sharingUrl, resolvedUrl);
+      } catch (e: any) {
+        console.error("[Favicon] Base64 resolve error:", e.message);
+      }
+    }
+
+    if (resolvedUrl) {
+      try {
+        const logoResponse = await fetch(resolvedUrl, {
+          method: "GET",
+          headers: {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+          }
+        });
+
+        if (logoResponse.ok) {
+          // Cache the logo heavily (e.g., 7 days)
+          res.setHeader("Cache-Control", "public, max-age=604800, immutable");
+          res.setHeader("Content-Type", "image/png");
+          
+          const arrayBuffer = await logoResponse.arrayBuffer();
+          const buffer = Buffer.from(arrayBuffer);
+          return res.send(buffer);
+        } else {
+          console.error(`[Favicon] Fetch failed with status: ${logoResponse.status}`);
+        }
+      } catch (error: any) {
+        console.error("[Favicon] Error proxying logo stream:", error.message);
+      }
+    }
+
+    return res.status(404).send("Favicon not found");
+  });
+
   // API Route to resolve OneDrive short urls (1drv.ms/i/c) and general links like Google/Facebook to direct links
   app.get("/api/resolve-onedrive", async (req, res) => {
     const rawUrl = req.query.url as string;
