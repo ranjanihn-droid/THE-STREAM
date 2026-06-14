@@ -4,27 +4,84 @@ import { HOME_INTRO, IMAGES } from "../data";
 import { motion } from "motion/react";
 import StreamLogo from "./StreamLogo";
 
+// Converts standard OneDrive share links to direct downloadable/renderable asset links
+const getOneDriveDirectUrl = (sharingUrl: string) => {
+  if (!sharingUrl) return "";
+  if (sharingUrl.startsWith("/") || sharingUrl.startsWith(".") || !sharingUrl.startsWith("http")) {
+    return sharingUrl;
+  }
+  try {
+    const cleanUrl = sharingUrl.split("?")[0];
+    const base64 = btoa(cleanUrl)
+      .replace(/\+/g, "-")
+      .replace(/\//g, "_")
+      .replace(/=+$/, "");
+    return `https://api.onedrive.com/v1.0/shares/u!${base64}/root/content`;
+  } catch {
+    return sharingUrl;
+  }
+};
+
+const WIDE_ORIGINAL = "https://1drv.ms/i/c/4dae11835575d5c1/IQRSCwewcPnWTIh4SEaCj3geAXfU0n8bz11N3QL3UkIHE-8";
+const MOBILE_ORIGINAL = "https://1drv.ms/i/c/4dae11835575d5c1/IQRokX3W6yx3RpGScH9d1OZ1AZmjs1IxqHziMPganZkvASI";
+
+const appendParam = (url: string, param: string): string | null => {
+  if (!url) return null;
+  if (url.includes("?")) {
+    return `${url}&${param}`;
+  }
+  return `${url}?${param}`;
+};
+
 interface HomeViewProps {
   onExplorePrograms: () => void;
 }
 
 export default function HomeView({ onExplorePrograms }: HomeViewProps) {
-  const [imgUrl, setImgUrl] = useState<string>("");
   const [useIframeFallback, setUseIframeFallback] = useState<boolean>(false);
+  const [wideDirectUrl, setWideDirectUrl] = useState<string>(() => getOneDriveDirectUrl(WIDE_ORIGINAL));
+  const [mobileDirectUrl, setMobileDirectUrl] = useState<string>(() => getOneDriveDirectUrl(MOBILE_ORIGINAL));
 
   useEffect(() => {
-    const originalUrl = "https://1drv.ms/u/c/4dae11835575d5c1/IQTGfBm9w_6VSbqw4z63RcHkAfslr44LZofupMWjxh4chAc";
-    try {
-      // Standard Microsoft OneDrive API direct file mapping using base64 sharing ID
-      const base64 = btoa(originalUrl)
-        .replace(/\+/g, "-")
-        .replace(/\//g, "_")
-        .replace(/=+$/, "");
-      setImgUrl(`https://api.onedrive.com/v1.0/shares/u!${base64}/root/content`);
-    } catch (e) {
-      console.error("HomeView: Failed to generate direct OneDrive link, using native fallback structure:", e);
-      setUseIframeFallback(true);
-    }
+    // Request ultra-stable CDN redirect direct download URLs from server
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 4000);
+
+    fetch(`/api/resolve-onedrive?url=${encodeURIComponent(WIDE_ORIGINAL)}`, { signal: controller.signal })
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed response");
+        return res.json();
+      })
+      .then((data) => {
+        if (data.resolvedUrl) {
+          setWideDirectUrl(data.resolvedUrl);
+        }
+      })
+      .catch((err) => {
+        console.warn("Home wide image server resolution fallback:", err.message);
+      });
+
+    fetch(`/api/resolve-onedrive?url=${encodeURIComponent(MOBILE_ORIGINAL)}`, { signal: controller.signal })
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed response");
+        return res.json();
+      })
+      .then((data) => {
+        if (data.resolvedUrl) {
+          setMobileDirectUrl(data.resolvedUrl);
+        }
+      })
+      .catch((err) => {
+        console.warn("Home mobile image server resolution fallback:", err.message);
+      })
+      .finally(() => {
+        clearTimeout(timeoutId);
+      });
+
+    return () => {
+      clearTimeout(timeoutId);
+      controller.abort();
+    };
   }, []);
 
   return (
@@ -32,82 +89,68 @@ export default function HomeView({ onExplorePrograms }: HomeViewProps) {
       
       {/* 🧘 J. Krishnamurti Inspiration Layout & Top Branding Section */}
       <section 
-        className="relative bg-white py-12 px-4 overflow-hidden border-b border-[#F37021] flex flex-col items-center w-full"
+        className="relative bg-white py-16 px-6 overflow-hidden border-b border-[#F37021] flex flex-col items-center w-full"
         id="inspiration-landing"
       >
         <div className="w-full max-w-7xl mx-auto flex flex-col items-center">
           
-          {/* 🧘 J. Krishnamurti Inspiration Layout (Side-by-Side as inspired by the uploaded image) */}
-          <div className="w-full bg-white grid grid-cols-1 lg:grid-cols-12 mb-6 gap-8 lg:gap-12">
-            
-            {/* Left side: Originally Uploaded Image resolved directly from OneDrive */}
-            <div className="lg:col-span-5 relative min-h-[410px] lg:min-h-[580px] bg-stone-50 border border-stone-200/60 rounded-2xl overflow-hidden flex items-stretch p-1 shadow-sm">
-              {useIframeFallback ? (
-                <iframe 
-                  src="https://1drv.ms/u/c/4dae11835575d5c1/IQTGfBm9w_6VSbqw4z63RcHkAfslr44LZofupMWjxh4chAc" 
-                  width="100%" 
-                  title="Originally Uploaded Inspiration Image"
-                  className="w-full min-h-[410px] lg:min-h-full border-0 select-none bg-transparent"
-                  scrolling="no"
-                ></iframe>
-              ) : (
-                <div className="w-full h-full flex items-center justify-center relative p-1">
-                  {!imgUrl && (
-                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-stone-50 text-center gap-3">
-                      <Aperture className="w-10 h-10 text-[#F37021] animate-spin-slow" />
-                      <span className="font-mono text-[11px] text-[#7F817F]">Loading Inspiration Plate...</span>
-                    </div>
-                  )}
-                  {imgUrl && (
-                    <img 
-                      src={imgUrl} 
-                      alt="Originally Uploaded Inspiration Image"
-                      referrerPolicy="no-referrer"
-                      className="w-full h-full object-contain rounded-xl select-none"
-                      onError={() => {
-                        console.warn("Direct image failed to load, falling back to Microsoft interactive iframe.");
-                        setUseIframeFallback(true);
-                      }}
-                    />
-                  )}
-                </div>
-              )}
-            </div>
+          <span className="text-[#F37021] font-amatic text-2xl sm:text-3xl font-bold tracking-widest uppercase mb-6 block text-center">
+            The Foundation of Inquiry
+          </span>
+ 
+          {/* Clean full-bleed responsive inspiration image hero container */}
+          <div className="w-full max-w-5xl flex items-center justify-center relative mb-10">
+            {useIframeFallback ? (
+              <iframe 
+                src="https://1drv.ms/i/c/4dae11835575d5c1/IQRSCwewcPnWTIh4SEaCj3geAXfU0n8bz11N3QL3UkIHE-8" 
+                width="100%" 
+                title="J. Krishnamurti Portrait Artwork"
+                className="w-full aspect-[2/1] border-0 select-none bg-transparent"
+                scrolling="no"
+              ></iframe>
+            ) : (
+              <picture className="w-full h-full block">
+                {/* Wide screens (widescreen hero aspect-ratio) */}
+                {wideDirectUrl && (
+                  <source media="(min-width: 1024px)" srcSet={appendParam(wideDirectUrl, "width=3780&height=1890") || undefined} />
+                )}
+                {/* Narrow / Tablet screens (optimized mobile layout) */}
+                <img 
+                  src={appendParam(mobileDirectUrl, "width=1024") || undefined}
+                  alt="Jiddu Krishnamurti Quote Inspiration: You have to be your own TEACHER"
+                  referrerPolicy="no-referrer"
+                  className="w-full h-auto object-contain select-none"
+                  onError={() => {
+                    console.warn("Direct sharing image loaded with fallback logic.");
+                    setUseIframeFallback(true);
+                  }}
+                />
+              </picture>
+            )}
+          </div>
 
-            {/* Right side: Inspiration Quote and explanation */}
-            <div className="lg:col-span-7 bg-white p-4 sm:p-8 flex flex-col justify-center">
-              <span className="text-[#F37021] font-amatic text-2xl font-bold tracking-widest uppercase mb-4 block">
-                The Foundation of Inquiry
-              </span>
+          {/* Underpinning philosophy description block */}
+          <div className="max-w-3xl text-center space-y-6">
+            <p className="font-hand text-xl sm:text-2xl text-espresso/90 leading-relaxed italic max-w-2xl mx-auto">
+              "So you have to be your own teacher and your own disciple, and there is no teacher outside, no saviour, no master; you yourself have to change, and therefore you have to learn to observe, to know yourself. This learning about yourself is a fascinating and joyous business."
+            </p>
+            <p className="font-hand text-lg text-[#5A5C5A] leading-relaxed max-w-xl mx-auto">
+              In association with <strong className="text-espresso font-semibold">NeeAr</strong>, this core belief underpins every module in <strong className="text-[#F37021]">The Stream</strong>. We do not manufacture teachers to follow automated templates; we nurture conscious educators who learn to look closely at themselves, the child, and the environment.
+            </p>
+
+            <div className="flex flex-wrap items-center justify-center gap-4 pt-4">
+              <button
+                onClick={onExplorePrograms}
+                className="px-8 py-3.5 bg-[#F37021] hover:bg-[#E05A10] text-[#FFFFFF] font-sketch text-lg rounded shadow-sm hover:shadow-lg hover:scale-[1.01] transition-all flex items-center justify-center gap-2 border border-[#1A1D1C]"
+              >
+                <span>Explore Our Programs</span>
+                <ArrowRight className="w-5 h-5 text-white" />
+              </button>
               
-              <h2 className="font-chalk text-4xl sm:text-5xl text-[#1A1D1C] mb-6 leading-tight border-b-2 border-dashed border-[#DDDCDA] pb-3" style={{ fontFamily: "Fredericka the Great, cursive" }}>
-                Inspiration
-              </h2>
-
-              <p className="font-hand text-xl sm:text-2xl text-[#1A1D1C] leading-relaxed mb-6 italic select-all">
-                "So you have to be your own teacher and your own disciple, and there is no teacher outside, no saviour, no master; you yourself have to change, and therefore you have to learn to observe, to know yourself. This learning about yourself is a fascinating and joyous business."
-              </p>
-
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-4 border-t border-[#1A1D1C]/10 pt-6">
-                <div>
-                  <span className="font-sketch text-lg text-[#F37021] block">
-                    — Jiddu Krishnamurti
-                  </span>
-                  <span className="font-hand text-sm text-[#5A5C5A]">
-                    “Talks with American Students”
-                  </span>
-                </div>
-
-                <button
-                  onClick={onExplorePrograms}
-                  className="px-6 py-3 bg-[#F37021] hover:bg-[#E05A10] text-[#FFFFFF] font-sketch text-base rounded shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-2 border border-[#1A1D1C] self-start sm:self-center"
-                >
-                  <span>Explore Programs</span>
-                  <ArrowRight className="w-4 h-4 text-white" />
-                </button>
-              </div>
+              <span className="font-mono text-xs text-[#7F817F] uppercase tracking-wider px-3 py-1 bg-stone-50 border border-stone-200/50 rounded-full">
+                STREAM & NeeAr TTP
+              </span>
             </div>
-
           </div>
 
         </div>

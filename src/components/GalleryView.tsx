@@ -57,7 +57,10 @@ export default function GalleryView() {
         return;
       }
 
-      fetch(`/api/resolve-onedrive?url=${encodeURIComponent(original)}`)
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 2500);
+
+      fetch(`/api/resolve-onedrive?url=${encodeURIComponent(original)}`, { signal: controller.signal })
         .then((res) => {
           if (!res.ok) throw new Error("Failed to resolve URL");
           return res.json();
@@ -76,6 +79,7 @@ export default function GalleryView() {
           setResolvedUrls((prev) => ({ ...prev, [original]: getOneDriveDirectUrl(original) }));
         })
         .finally(() => {
+          clearTimeout(timeoutId);
           setLoadingItems((prev) => ({ ...prev, [original]: false }));
         });
     });

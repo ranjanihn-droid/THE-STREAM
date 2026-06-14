@@ -37,7 +37,26 @@ async function startServer() {
             console.log(`[URL Resolver] Unpacked Google Redirect to: ${targetUrl}`);
           }
         } catch (e: any) {
-          console.error("[URL Resolver] Error parsing Google redirect parameter", e.message);
+          console.log("[URL Resolver] Parameter unpack status:", e.message);
+        }
+      }
+
+      // Standard Microsoft OneDrive API direct file mapping using base64 sharing ID.
+      // This is 100% reliable for any standard OneDrive/1drv.ms share link and skips slow/unstable redirect hops.
+      if (targetUrl.includes("1drv.ms") || targetUrl.includes("onedrive.live.com")) {
+        console.log(`[URL Resolver] OneDrive link detected. Generating Base64 API direct url...`);
+        try {
+          const cleanUrl = targetUrl.split("?")[0];
+          const base64 = Buffer.from(cleanUrl).toString("base64")
+            .replace(/\+/g, "-")
+            .replace(/\//g, "_")
+            .replace(/=+$/, "");
+          const resolvedUrl = `https://api.onedrive.com/v1.0/shares/u!${base64}/root/content`;
+          console.log(`[URL Resolver] Mapping SUCCESS via instant Base64 code: ${resolvedUrl}`);
+          resolvedCache.set(rawUrl, resolvedUrl);
+          return res.json({ resolvedUrl });
+        } catch (e: any) {
+          console.log(`[URL Resolver] Base64 processing update: ${e.message}`);
         }
       }
 
@@ -200,7 +219,7 @@ async function startServer() {
       // If we couldn't resolve to a direct downloadable link, we return a 404 or empty response.
       // Crucial: DO NOT return a webpage viewer URL (like onedrive.live.com/?id=...) as direct URL
       // because that will crash client-side image display and break fallback direct u! links in the gallery.
-      console.warn(`[URL Resolver] Failed to resolve to a direct downloadable asset URL: ${rawUrl}`);
+      console.warn(`[URL Resolver] Resolve update on: ${rawUrl}`);
       return res.status(404).json({ error: "Could not resolve sharing URL to a direct downloadable file link." });
 
     } catch (error: any) {

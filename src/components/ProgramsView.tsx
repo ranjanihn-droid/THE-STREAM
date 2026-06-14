@@ -1,4 +1,4 @@
-import { BookOpen, Calendar, MapPin, Sparkles, Heart, Brain, Users, Compass, HelpCircle } from "lucide-react";
+import { BookOpen, Calendar, MapPin, Sparkles, Heart, Brain, Users, Compass, HelpCircle, ExternalLink } from "lucide-react";
 import { CORE_PROGRAM, INCLUSIVE_PROGRAM, PARENT_PROGRAM } from "../data";
 import { motion } from "motion/react";
 
@@ -319,6 +319,177 @@ export default function ProgramsView() {
 
           <div className="mt-8 text-center text-xs font-mono text-[#5A5C5A] uppercase tracking-widest">
             ★ INTIMATE DIALOGUE GROUPS • HOLISTIC LIVING PRINCIPLES
+          </div>
+        </section>
+
+        {/* 🎬 5. Dialogue Screenings & Watch Suggestions Section */}
+        <section className="mt-24 mb-16" id="watch-suggestions">
+          <div className="text-center mb-12">
+            <span className="text-[#F37021] font-amatic text-2xl font-bold tracking-widest uppercase mb-1 block">
+              Dialogue Screenings
+            </span>
+            <h3 className="font-sketch text-3xl sm:text-5xl text-espresso mt-2 mb-4">
+              Watch Suggestions
+            </h3>
+            <p className="font-hand text-lg sm:text-xl text-[#1A1D1C]/80 leading-relaxed max-w-2xl mx-auto">
+              Selected lectures and foundational dialogues on the nature of enquiry, observation, and right learning.
+            </p>
+            <div className="w-16 h-1 bg-[#F37021] mx-auto rounded-full mt-4" />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Video One */}
+            <motion.div 
+              initial={{ opacity: 0, y: 15 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="bg-white rounded-2xl border border-[#1A1D1C]/15 overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col h-full"
+            >
+              <div className="aspect-video w-full bg-black relative">
+                <iframe
+                  src="https://www.youtube.com/embed/IEEg6dwYrxk"
+                  title="What is the Purpose of Education? | J. Krishnamurti"
+                  className="w-full h-full border-0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                ></iframe>
+              </div>
+              <div className="p-6 flex flex-col flex-grow justify-between">
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="font-mono text-[9px] text-[#F37021] uppercase tracking-wider px-2 py-0.5 bg-amber-50 border border-[#F37021]/20 rounded font-semibold">
+                      Education
+                    </span>
+                    <span className="font-mono text-[9px] text-stone-500 uppercase tracking-wider">
+                      ~10 mins
+                    </span>
+                  </div>
+                  <h4 className="font-sketch text-xl text-espresso mb-3 leading-tight">
+                    What is the Purpose of Education?
+                  </h4>
+                  <p className="font-hand text-base text-[#5A5C5A] leading-relaxed mb-4">
+                    An intense inquiry into whether education is merely acquiring skills and career security, or if it is the awakening of intelligence to understand life as a whole.
+                  </p>
+                </div>
+                <div className="pt-3 border-t border-stone-100 flex items-center justify-between">
+                  <span className="font-mono text-[10px] text-stone-400 uppercase tracking-widest">
+                    J. Krishnamurti
+                  </span>
+                  <a 
+                    href="https://youtu.be/IEEg6dwYrxk"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs font-mono text-[#F37021] hover:underline flex items-center gap-1"
+                  >
+                    <span>YouTube</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Video Two */}
+            <motion.div 
+              initial={{ opacity: 0, y: 15 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="bg-white rounded-2xl border border-[#1A1D1C]/15 overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col h-full"
+            >
+              <div className="aspect-video w-full bg-black relative">
+                <iframe
+                  src="https://www.youtube.com/embed/5fRbafjn12Y"
+                  title="To Learn, You Must Have a Quiet Mind | J. Krishnamurti"
+                  className="w-full h-full border-0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                ></iframe>
+              </div>
+              <div className="p-6 flex flex-col flex-grow justify-between">
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="font-mono text-[9px] text-[#F37021] uppercase tracking-wider px-2 py-0.5 bg-amber-50 border border-[#F37021]/20 rounded font-semibold">
+                      Learning
+                    </span>
+                    <span className="font-mono text-[9px] text-stone-500 uppercase tracking-wider">
+                      ~15 mins
+                    </span>
+                  </div>
+                  <h4 className="font-sketch text-xl text-espresso mb-3 leading-tight">
+                    To Learn, You Must Have a Quiet Mind
+                  </h4>
+                  <p className="font-hand text-base text-[#5A5C5A] leading-relaxed mb-4">
+                    J. Krishnamurti discusses how a mind burdened with comparison, competition, and authority cannot learn. Real learning demands the freedom of an unburdened mind.
+                  </p>
+                </div>
+                <div className="pt-3 border-t border-stone-100 flex items-center justify-between">
+                  <span className="font-mono text-[10px] text-stone-400 uppercase tracking-widest">
+                    J. Krishnamurti
+                  </span>
+                  <a 
+                    href="https://youtu.be/5fRbafjn12Y"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs font-mono text-[#F37021] hover:underline flex items-center gap-1"
+                  >
+                    <span>YouTube</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Video Three */}
+            <motion.div 
+              initial={{ opacity: 0, y: 15 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="bg-white rounded-2xl border border-[#1A1D1C]/15 overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col h-full"
+            >
+              <div className="aspect-video w-full bg-black relative">
+                <iframe
+                  src="https://www.youtube.com/embed/DEBE_PXCb_Y"
+                  title="Can you observe without the observer? | J. Krishnamurti"
+                  className="w-full h-full border-0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                ></iframe>
+              </div>
+              <div className="p-6 flex flex-col flex-grow justify-between">
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="font-mono text-[9px] text-[#F37021] uppercase tracking-wider px-2 py-0.5 bg-amber-50 border border-[#F37021]/20 rounded font-semibold">
+                      Inquiry
+                    </span>
+                    <span className="font-mono text-[9px] text-stone-500 uppercase tracking-wider">
+                      ~12 mins
+                    </span>
+                  </div>
+                  <h4 className="font-sketch text-xl text-espresso mb-3 leading-tight">
+                    Observation Without the Observer
+                  </h4>
+                  <p className="font-hand text-base text-[#5A5C5A] leading-relaxed mb-4">
+                    Investigating the deep division between the thinker and the thought. Discovering how a state of pure observing unlocks deep awareness without intellectual conflict.
+                  </p>
+                </div>
+                <div className="pt-3 border-t border-stone-100 flex items-center justify-between">
+                  <span className="font-mono text-[10px] text-stone-400 uppercase tracking-widest">
+                    J. Krishnamurti
+                  </span>
+                  <a 
+                    href="https://youtu.be/DEBE_PXCb_Y"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs font-mono text-[#F37021] hover:underline flex items-center gap-1"
+                  >
+                    <span>YouTube</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                </div>
+              </div>
+            </motion.div>
           </div>
         </section>
 

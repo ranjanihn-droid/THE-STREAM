@@ -18,6 +18,7 @@ import imgEarthyClassroom from "./assets/images/earthy_classroom_1780813726565.p
 import imgPeepalTreeAranyaani from "./assets/images/peepal_tree_aranyaani_learning_1780834301478.png";
 import imgDialogueCircle from "./assets/images/dialogue_circle_1780813676857.png";
 import imgNatureTrail from "./assets/images/nature_trail_1780813743029.png";
+import imgPeepalTreeLearning from "./assets/images/peepal_tree_learning_1780833942917.png";
 
 // Static paths for generated assets
 export const IMAGES = {
@@ -120,31 +121,31 @@ export const PLACEMENT_CONTENT = {
 
 export const GALLERY_ITEMS: GalleryItem[] = [
   {
-    imageSrc: "https://1drv.ms/i/c/4dae11835575d5c1/IQRlRuFNOWXNQp6EoYIQkDHmAUersEoWKswCVmzVq8hI8bA?width=4000&height=3000",
+    imageSrc: imgEarthyClassroom,
     title: "Poetic Material Studies",
     description: "Developing coordination and deep, persistent attention span through handwork and natural tactile craft.",
     mediaType: "image"
   },
   {
-    imageSrc: "https://1drv.ms/i/c/4dae11835575d5c1/IQQ7CUDaBJkHRYXJMslAZjJzAdGpZWve94sKY6LLKkA6cAE?width=4000&height=3000",
+    imageSrc: imgIndianDialogueCircle,
     title: "The Dialogue Canopy",
     description: "Bringing prospective educators together under open shade trees to run continuous observation and inquire collaboratively.",
     mediaType: "image"
   },
   {
-    imageSrc: "https://1drv.ms/i/c/4dae11835575d5c1/IQR0PtfwJ7R2Rq5Ce1Djnu9UAay4fUxgq57IPgBBlqykyMA?width=4000&height=3000",
+    imageSrc: imgIndianNatureTrail,
     title: "Unhurried Forest Pathways",
     description: "Venturing along unconstrained forest paths where sensory organic learning takes absolute cognitive precedence.",
     mediaType: "image"
   },
   {
-    imageSrc: "https://1drv.ms/i/c/4dae11835575d5c1/IQTCf4jnlVJBT4scR5IkxdM2AY7ETNAf5puIcpwFKq1IEb8?width=4000&height=3000",
+    imageSrc: imgIndianEarthyClassroom,
     title: "Earthy Sensory Journeys",
     description: "Direct tactile play on mud, sand, and soil, establishing the vital ground foundation for spatial math logic.",
     mediaType: "image"
   },
   {
-    imageSrc: "https://1drv.ms/i/c/4dae11835575d5c1/IQST5lSPJhH8TYXJlx0-TEFXAZMKkMRhvK1JzEaRYDQj4Sg?width=4000&height=3000",
+    imageSrc: imgPeepalTreeInteractive,
     title: "Tactile Ecosystem Mapping",
     description: "Graphing and diagramming trees and layout circles manually, merging environmental science with fine geometry.",
     mediaType: "image"
@@ -162,37 +163,37 @@ export const GALLERY_ITEMS: GalleryItem[] = [
     mediaType: "video"
   },
   {
-    imageSrc: "https://1drv.ms/i/c/4dae11835575d5c1/IQTGHAuObEyASq4bevdLIHWPATWo07d4XiUddq9CZ-rXD_4?width=4000&height=3000",
+    imageSrc: imgPeepalTreeLearning,
     title: "Free Constructive Studio",
     description: "An intuitive space enabling children to paint, construct, and play without strict performance metrics.",
     mediaType: "image"
   },
   {
-    imageSrc: "https://1drv.ms/i/c/4dae11835575d5c1/IQS4q05Ma93NQZ-dG5oEl3q7AUx5SP7JV7NDdwkXnXhXVtk?width=4000&height=3000",
+    imageSrc: imgDialogueCircle,
     title: "Twilight Reflection Circles",
     description: "Experiencing consensus and active listening during communal storytelling and daily review journals.",
     mediaType: "image"
   },
   {
-    imageSrc: "https://1drv.ms/i/c/4dae11835575d5c1/IQRgVUp6I_-pT6dJsb3ns9AhARnTSvXgQQTAu46Yq7BK_wI?width=4000&height=3000",
+    imageSrc: imgIndianGardenLearning,
     title: "Math Manipulatives & Geometry",
     description: "Grasping abstraction using wooden stones, seeds, and real physical blocks to count, stack, and puzzle.",
     mediaType: "image"
   },
   {
-    imageSrc: "https://1drv.ms/i/c/4dae11835575d5c1/IQQPylywcbBxTqJKkhwvU9ZDAV8_ojGTd8Y6GjL0SFH-lAY",
+    imageSrc: imgNatureTrail,
     title: "The Weaving Frame",
     description: "Calming nervous systems and focusing hands on raw fibers to construct beautiful handloom textures.",
     mediaType: "image"
   },
   {
-    imageSrc: "https://1drv.ms/i/c/4dae11835575d5c1/IQQKqDzvsW2pTYwkqcFJM2bpAVhFWTSho5R4D3KMyA5Ola8?width=6144&height=8192",
+    imageSrc: imgForestCanopy,
     title: "Trainee Written Inquiry Logs",
     description: "Curating handwritten journals, daily diagnostic files, and philosophical research outlines.",
     mediaType: "image"
   },
   {
-    imageSrc: "https://1drv.ms/i/c/4dae11835575d5c1/IQTVKJ9gnWmlQY4JTzLn9bo0AU4mL9MJ09LLWsaJXSyelh8?width=1600&height=1200",
+    imageSrc: imgPeepalTreeAranyaani,
     title: "Outdoor Equilibrium Practice",
     description: "Enhancing motor skills, balance, and peer support structures on raw climbing playgrounds.",
     mediaType: "image"
