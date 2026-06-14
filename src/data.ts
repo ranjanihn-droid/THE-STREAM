@@ -121,33 +121,21 @@ export const PLACEMENT_CONTENT = {
 
 export const GALLERY_ITEMS: GalleryItem[] = [
   {
-    imageSrc: imgEarthyClassroom,
-    title: "Poetic Material Studies",
-    description: "Developing coordination and deep, persistent attention span through handwork and natural tactile craft.",
+    imageSrc: "https://1drv.ms/i/c/4dae11835575d5c1/IQRSCwewcPnWTIh4SEaCj3geAXfU0n8bz11N3QL3UkIHE-8",
+    title: "Philosophy of Right Education (Wide Portrait)",
+    description: "The primary high-resolution inspiration artwork. Dedicated to continuous inquiry, observation, and inner learning.",
     mediaType: "image"
   },
   {
-    imageSrc: imgIndianDialogueCircle,
-    title: "The Dialogue Canopy",
-    description: "Bringing prospective educators together under open shade trees to run continuous observation and inquire collaboratively.",
+    imageSrc: "https://1drv.ms/i/c/4dae11835575d5c1/IQRokX3W6yx3RpGScH9d1OZ1AZmjs1IxqHziMPganZkvASI",
+    title: "Insightful Teachings (Mobile Portrait Layout)",
+    description: "The mobile-optimized presentation of J. Krishnamurti's quote: 'You have to be your own TEACHER'.",
     mediaType: "image"
   },
   {
-    imageSrc: imgIndianNatureTrail,
-    title: "Unhurried Forest Pathways",
-    description: "Venturing along unconstrained forest paths where sensory organic learning takes absolute cognitive precedence.",
-    mediaType: "image"
-  },
-  {
-    imageSrc: imgIndianEarthyClassroom,
-    title: "Earthy Sensory Journeys",
-    description: "Direct tactile play on mud, sand, and soil, establishing the vital ground foundation for spatial math logic.",
-    mediaType: "image"
-  },
-  {
-    imageSrc: imgPeepalTreeInteractive,
-    title: "Tactile Ecosystem Mapping",
-    description: "Graphing and diagramming trees and layout circles manually, merging environmental science with fine geometry.",
+    imageSrc: "https://1drv.ms/i/c/4dae11835575d5c1/IQRk2lquIovgQJVv1mzhRRJKAQnA_MsIYtlRS5q5Kkv03Tk",
+    title: "The Stream Official Crest",
+    description: "Authentic logo design of The Stream representing integrated, unhurried, fearless learning paradigms.",
     mediaType: "image"
   },
   {
@@ -157,46 +145,22 @@ export const GALLERY_ITEMS: GalleryItem[] = [
     mediaType: "video"
   },
   {
-    imageSrc: "https://1drv.ms/v/c/4dae11835575d5c1/IQRQl9Ix7av7R4lz4RoX0MghASpRpmDpOTQ-50QLiPMlvoo",
-    title: "Unhurried Dialogue - Video Stream II",
-    description: "Authentic, live video capturing active modules, sensory observation exercises, and collective circle check-ins.",
+    imageSrc: "https://youtu.be/IEEg6dwYrxk?si=vCJjcOOZsFMuWcII",
+    title: "What is the Purpose of Education?",
+    description: "An intense inquiry by J. Krishnamurti into whether education is merely acquiring skills and career security or the awakening of intelligence.",
     mediaType: "video"
   },
   {
-    imageSrc: imgPeepalTreeLearning,
-    title: "Free Constructive Studio",
-    description: "An intuitive space enabling children to paint, construct, and play without strict performance metrics.",
-    mediaType: "image"
+    imageSrc: "https://youtu.be/5fRbafjn12Y?si=_V-7CN86478JiZ3J",
+    title: "To Learn, You Must Have a Quiet Mind",
+    description: "J. Krishnamurti discusses how a mind burdened with comparison, competition, and authority cannot learn. Real learning demands freedom.",
+    mediaType: "video"
   },
   {
-    imageSrc: imgDialogueCircle,
-    title: "Twilight Reflection Circles",
-    description: "Experiencing consensus and active listening during communal storytelling and daily review journals.",
-    mediaType: "image"
-  },
-  {
-    imageSrc: imgIndianGardenLearning,
-    title: "Math Manipulatives & Geometry",
-    description: "Grasping abstraction using wooden stones, seeds, and real physical blocks to count, stack, and puzzle.",
-    mediaType: "image"
-  },
-  {
-    imageSrc: imgNatureTrail,
-    title: "The Weaving Frame",
-    description: "Calming nervous systems and focusing hands on raw fibers to construct beautiful handloom textures.",
-    mediaType: "image"
-  },
-  {
-    imageSrc: imgForestCanopy,
-    title: "Trainee Written Inquiry Logs",
-    description: "Curating handwritten journals, daily diagnostic files, and philosophical research outlines.",
-    mediaType: "image"
-  },
-  {
-    imageSrc: imgPeepalTreeAranyaani,
-    title: "Outdoor Equilibrium Practice",
-    description: "Enhancing motor skills, balance, and peer support structures on raw climbing playgrounds.",
-    mediaType: "image"
+    imageSrc: "https://youtu.be/DEBE_PXCb_Y?si=kMjqPGKBSPXKBRPr",
+    title: "Observation Without the Observer",
+    description: "Investigating the deep division between the thinker and the thought. Discovering how a state of pure observing unlocks deep awareness.",
+    mediaType: "video"
   }
 ];
 

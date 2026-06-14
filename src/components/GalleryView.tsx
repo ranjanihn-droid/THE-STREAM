@@ -57,6 +57,21 @@ export default function GalleryView() {
         return;
       }
 
+      if (original.includes("youtube.com") || original.includes("youtu.be")) {
+        // Convert to embed URL directly if not already
+        let embedUrl = original;
+        if (!original.includes("embed/")) {
+          const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+          const match = original.match(regExp);
+          if (match && match[2].length === 11) {
+            embedUrl = `https://www.youtube.com/embed/${match[2]}`;
+          }
+        }
+        setResolvedUrls((prev) => ({ ...prev, [original]: embedUrl }));
+        setLoadingItems((prev) => ({ ...prev, [original]: false }));
+        return;
+      }
+
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 2500);
 
@@ -411,7 +426,7 @@ export default function GalleryView() {
                         {item.mediaType === "video" ? (
                           <div className="w-full h-full bg-[#1A1D1C] flex flex-col items-center justify-center p-1 text-center text-[10px] text-white">
                             <Video className="w-4 h-4 text-rose-400 mb-0.5" />
-                            <span className="font-mono text-[8px] uppercase line-clamp-1">Clip {index - 4}</span>
+                            <span className="font-mono text-[8px] uppercase line-clamp-1">Video Clip</span>
                           </div>
                         ) : loadingItems[item.imageSrc] || !resolvedUrls[item.imageSrc] ? (
                           <div className="w-full h-full bg-stone-200 animate-pulse flex items-center justify-center">

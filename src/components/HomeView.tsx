@@ -25,20 +25,11 @@ const getOneDriveDirectUrl = (sharingUrl: string) => {
 const WIDE_ORIGINAL = "https://1drv.ms/i/c/4dae11835575d5c1/IQRSCwewcPnWTIh4SEaCj3geAXfU0n8bz11N3QL3UkIHE-8";
 const MOBILE_ORIGINAL = "https://1drv.ms/i/c/4dae11835575d5c1/IQRokX3W6yx3RpGScH9d1OZ1AZmjs1IxqHziMPganZkvASI";
 
-const appendParam = (url: string, param: string): string | null => {
-  if (!url) return null;
-  if (url.includes("?")) {
-    return `${url}&${param}`;
-  }
-  return `${url}?${param}`;
-};
-
 interface HomeViewProps {
   onExplorePrograms: () => void;
 }
 
 export default function HomeView({ onExplorePrograms }: HomeViewProps) {
-  const [useIframeFallback, setUseIframeFallback] = useState<boolean>(false);
   const [wideDirectUrl, setWideDirectUrl] = useState<string>(() => getOneDriveDirectUrl(WIDE_ORIGINAL));
   const [mobileDirectUrl, setMobileDirectUrl] = useState<string>(() => getOneDriveDirectUrl(MOBILE_ORIGINAL));
 
@@ -100,33 +91,19 @@ export default function HomeView({ onExplorePrograms }: HomeViewProps) {
  
           {/* Clean full-bleed responsive inspiration image hero container */}
           <div className="w-full max-w-5xl flex items-center justify-center relative mb-10">
-            {useIframeFallback ? (
-              <iframe 
-                src="https://1drv.ms/i/c/4dae11835575d5c1/IQRSCwewcPnWTIh4SEaCj3geAXfU0n8bz11N3QL3UkIHE-8" 
-                width="100%" 
-                title="J. Krishnamurti Portrait Artwork"
-                className="w-full aspect-[2/1] border-0 select-none bg-transparent"
-                scrolling="no"
-              ></iframe>
-            ) : (
-              <picture className="w-full h-full block">
-                {/* Wide screens (widescreen hero aspect-ratio) */}
-                {wideDirectUrl && (
-                  <source media="(min-width: 1024px)" srcSet={appendParam(wideDirectUrl, "width=3780&height=1890") || undefined} />
-                )}
-                {/* Narrow / Tablet screens (optimized mobile layout) */}
-                <img 
-                  src={appendParam(mobileDirectUrl, "width=1024") || undefined}
-                  alt="Jiddu Krishnamurti Quote Inspiration: You have to be your own TEACHER"
-                  referrerPolicy="no-referrer"
-                  className="w-full h-auto object-contain select-none"
-                  onError={() => {
-                    console.warn("Direct sharing image loaded with fallback logic.");
-                    setUseIframeFallback(true);
-                  }}
-                />
-              </picture>
-            )}
+            <picture className="w-full h-full block">
+              {/* Wide screens (widescreen hero aspect-ratio) */}
+              {wideDirectUrl && (
+                <source media="(min-width: 1024px)" srcSet={wideDirectUrl} />
+              )}
+              {/* Narrow / Tablet screens (optimized mobile layout) */}
+              <img 
+                src={mobileDirectUrl || undefined}
+                alt="Jiddu Krishnamurti Quote Inspiration: You have to be your own TEACHER"
+                referrerPolicy="no-referrer"
+                className="w-full h-auto object-contain select-none shadow-sm rounded-lg"
+              />
+            </picture>
           </div>
 
           {/* Underpinning philosophy description block */}
