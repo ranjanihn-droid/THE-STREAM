@@ -1,79 +1,17 @@
-import { useState, useEffect } from "react";
-import { ArrowRight, Sprout, HeartHandshake, Aperture } from "lucide-react";
+import { ArrowRight, Sprout, HeartHandshake } from "lucide-react";
 import { HOME_INTRO, IMAGES } from "../data";
-import { motion } from "motion/react";
 import StreamLogo from "./StreamLogo";
 
-// Converts standard OneDrive share links to direct downloadable/renderable asset links
-const getOneDriveDirectUrl = (sharingUrl: string) => {
-  if (!sharingUrl) return "";
-  if (sharingUrl.startsWith("/") || sharingUrl.startsWith(".") || !sharingUrl.startsWith("http")) {
-    return sharingUrl;
-  }
-  try {
-    const cleanUrl = sharingUrl.split("?")[0];
-    const base64 = btoa(cleanUrl)
-      .replace(/\+/g, "-")
-      .replace(/\//g, "_")
-      .replace(/=+$/, "");
-    return `https://api.onedrive.com/v1.0/shares/u!${base64}/root/content`;
-  } catch {
-    return sharingUrl;
-  }
-};
-
-const WIDE_ORIGINAL = "https://1drv.ms/i/c/4dae11835575d5c1/IQRSCwewcPnWTIh4SEaCj3geAXfU0n8bz11N3QL3UkIHE-8";
-const MOBILE_ORIGINAL = "https://1drv.ms/i/c/4dae11835575d5c1/IQRokX3W6yx3RpGScH9d1OZ1AZmjs1IxqHziMPganZkvASI";
+// Import real local uploaded high-resolution assets
+import wideBannerImg from "../assets/images/You have to be your own Teacher'-1.png";
 
 interface HomeViewProps {
   onExplorePrograms: () => void;
 }
 
 export default function HomeView({ onExplorePrograms }: HomeViewProps) {
-  const [wideDirectUrl, setWideDirectUrl] = useState<string>(() => getOneDriveDirectUrl(WIDE_ORIGINAL));
-  const [mobileDirectUrl, setMobileDirectUrl] = useState<string>(() => getOneDriveDirectUrl(MOBILE_ORIGINAL));
-
-  useEffect(() => {
-    // Request ultra-stable CDN redirect direct download URLs from server
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 4000);
-
-    fetch(`/api/resolve-onedrive?url=${encodeURIComponent(WIDE_ORIGINAL)}`, { signal: controller.signal })
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed response");
-        return res.json();
-      })
-      .then((data) => {
-        if (data.resolvedUrl) {
-          setWideDirectUrl(data.resolvedUrl);
-        }
-      })
-      .catch((err) => {
-        console.warn("Home wide image server resolution fallback:", err.message);
-      });
-
-    fetch(`/api/resolve-onedrive?url=${encodeURIComponent(MOBILE_ORIGINAL)}`, { signal: controller.signal })
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed response");
-        return res.json();
-      })
-      .then((data) => {
-        if (data.resolvedUrl) {
-          setMobileDirectUrl(data.resolvedUrl);
-        }
-      })
-      .catch((err) => {
-        console.warn("Home mobile image server resolution fallback:", err.message);
-      })
-      .finally(() => {
-        clearTimeout(timeoutId);
-      });
-
-    return () => {
-      clearTimeout(timeoutId);
-      controller.abort();
-    };
-  }, []);
+  const wideDirectUrl = wideBannerImg;
+  const mobileDirectUrl = wideBannerImg;
 
   return (
     <div className="flex flex-col min-h-screen bg-white">

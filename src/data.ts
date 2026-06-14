@@ -20,6 +20,13 @@ import imgDialogueCircle from "./assets/images/dialogue_circle_1780813676857.png
 import imgNatureTrail from "./assets/images/nature_trail_1780813743029.png";
 import imgPeepalTreeLearning from "./assets/images/peepal_tree_learning_1780833942917.png";
 
+// Import real local uploaded high-resolution assets
+import gallImg1 from "./assets/images/20240803_105339.jpg";
+import gallImg2 from "./assets/images/20240803_105736.jpg";
+import gallImg3 from "./assets/images/20250528_121125.jpg";
+import gallImg4 from "./assets/images/20250528_121147.jpg";
+import gallImg5 from "./assets/images/20250606_142102.jpg";
+
 // Static paths for generated assets
 export const IMAGES = {
   dialogueCircle: dialogueCircleImg,
@@ -121,29 +128,38 @@ export const PLACEMENT_CONTENT = {
 
 export const GALLERY_ITEMS: GalleryItem[] = [
   {
-    imageSrc: "https://1drv.ms/i/c/4dae11835575d5c1/IQRSCwewcPnWTIh4SEaCj3geAXfU0n8bz11N3QL3UkIHE-8",
-    title: "Philosophy of Right Education (Wide Portrait)",
-    description: "The primary high-resolution inspiration artwork. Dedicated to continuous inquiry, observation, and inner learning.",
+    imageSrc: gallImg1,
+    title: "Outdoor Community Circle",
+    description: "Active check-ins and unhurried group dialogue circles with training facilitators and educators under open shade.",
     mediaType: "image"
   },
   {
-    imageSrc: "https://1drv.ms/i/c/4dae11835575d5c1/IQRokX3W6yx3RpGScH9d1OZ1AZmjs1IxqHziMPganZkvASI",
-    title: "Insightful Teachings (Mobile Portrait Layout)",
-    description: "The mobile-optimized presentation of J. Krishnamurti's quote: 'You have to be your own TEACHER'.",
+    imageSrc: gallImg2,
+    title: "Ecosystem Observation & Mapping",
+    description: "Prospective teachers mapping tree coordinates, structures, and direct spatial interactions manually.",
     mediaType: "image"
   },
   {
-    imageSrc: "https://1drv.ms/i/c/4dae11835575d5c1/IQRk2lquIovgQJVv1mzhRRJKAQnA_MsIYtlRS5q5Kkv03Tk",
-    title: "The Stream Official Crest",
-    description: "Authentic logo design of The Stream representing integrated, unhurried, fearless learning paradigms.",
+    imageSrc: gallImg3,
+    title: "Interactive Workshop Session",
+    description: "Grasping abstract educational philosophies using tactile blocks, natural seeds, and physical construction materials.",
     mediaType: "image"
   },
   {
-    imageSrc: "https://1drv.ms/v/c/4dae11835575d5c1/IQRQl9Ix7av7R4lz4RoX0MghASpRpmDpOTQ-50QLiPMlvoo",
-    title: "Unhurried Dialogue - Video Stream I",
-    description: "Active video footage showing trainers and trainees dialoguing under the open canopy, practicing direct diagnostic awareness.",
-    mediaType: "video"
+    imageSrc: gallImg4,
+    title: "Curriculum Exploration Circle",
+    description: "Diving deep into the alternative pedagogical frameworks and MSKTW inclusion tracks in association with NeeAr.",
+    mediaType: "image"
   },
+  {
+    imageSrc: gallImg5,
+    title: "Sensory Nature Walkway Study",
+    description: "Experiential outdoor study of local woodlands and vegetation on loose, unhurried paths.",
+    mediaType: "image"
+  }
+];
+
+export const JK_VIDEOS: GalleryItem[] = [
   {
     imageSrc: "https://youtu.be/IEEg6dwYrxk?si=vCJjcOOZsFMuWcII",
     title: "What is the Purpose of Education?",

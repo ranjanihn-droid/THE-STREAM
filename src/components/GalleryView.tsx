@@ -14,7 +14,7 @@ import {
   Layers,
   ArrowRight
 } from "lucide-react";
-import { GALLERY_ITEMS } from "../data";
+import { GALLERY_ITEMS, JK_VIDEOS } from "../data";
 import { GalleryItem } from "../types";
 import { motion, AnimatePresence } from "motion/react";
 
@@ -36,72 +36,46 @@ const getOneDriveDirectUrl = (sharingUrl: string) => {
   }
 };
 
+// Extracts YouTube video ID from standard watch or sharing links
+const getYoutubeId = (url: string) => {
+  if (!url) return "";
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+  const match = url.match(regExp);
+  return (match && match[2].length === 11) ? match[2] : "";
+};
+
 export default function GalleryView() {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [resolvedUrls, setResolvedUrls] = useState<Record<string, string>>({});
+  
+  // Pre-resolve all local variables immediately for ultra-fast, responsive rendering
+  const [resolvedUrls, setResolvedUrls] = useState<Record<string, string>>(() => {
+    const initialUrls: Record<string, string> = {};
+    GALLERY_ITEMS.forEach((item) => {
+      initialUrls[item.imageSrc] = item.imageSrc;
+    });
+    return initialUrls;
+  });
+
   const [loadingItems, setLoadingItems] = useState<Record<string, boolean>>(() => {
     const initialLoading: Record<string, boolean> = {};
     GALLERY_ITEMS.forEach((item) => {
-      initialLoading[item.imageSrc] = true;
+      initialLoading[item.imageSrc] = false;
     });
     return initialLoading;
   });
 
-  // Lazily resolve OneDrive short links to direct download/streaming URLs
+  // No remote resolutions needed since all assets are high-performance local imports
   useEffect(() => {
+    const urls: Record<string, string> = {};
     GALLERY_ITEMS.forEach((item) => {
-      const original = item.imageSrc;
-      if (!original.startsWith("http")) {
-        setResolvedUrls((prev) => ({ ...prev, [original]: original }));
-        setLoadingItems((prev) => ({ ...prev, [original]: false }));
-        return;
-      }
-
-      if (original.includes("youtube.com") || original.includes("youtu.be")) {
-        // Convert to embed URL directly if not already
-        let embedUrl = original;
-        if (!original.includes("embed/")) {
-          const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-          const match = original.match(regExp);
-          if (match && match[2].length === 11) {
-            embedUrl = `https://www.youtube.com/embed/${match[2]}`;
-          }
-        }
-        setResolvedUrls((prev) => ({ ...prev, [original]: embedUrl }));
-        setLoadingItems((prev) => ({ ...prev, [original]: false }));
-        return;
-      }
-
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 2500);
-
-      fetch(`/api/resolve-onedrive?url=${encodeURIComponent(original)}`, { signal: controller.signal })
-        .then((res) => {
-          if (!res.ok) throw new Error("Failed to resolve URL");
-          return res.json();
-        })
-        .then((data) => {
-          if (data.resolvedUrl) {
-            setResolvedUrls((prev) => ({ ...prev, [original]: data.resolvedUrl }));
-          } else {
-            // Fallback to client-side direct token-link calculation
-            setResolvedUrls((prev) => ({ ...prev, [original]: getOneDriveDirectUrl(original) }));
-          }
-        })
-        .catch((err) => {
-          console.warn("Lazy resolution error for:", original, err.message);
-          // Fallback to client-side direct token-link calculation
-          setResolvedUrls((prev) => ({ ...prev, [original]: getOneDriveDirectUrl(original) }));
-        })
-        .finally(() => {
-          clearTimeout(timeoutId);
-          setLoadingItems((prev) => ({ ...prev, [original]: false }));
-        });
+      urls[item.imageSrc] = item.imageSrc;
     });
+    setResolvedUrls(urls);
   }, []);
   const [viewMode, setViewMode] = useState<"carousel" | "grid">("carousel");
   const [isPlaying, setIsPlaying] = useState(false);
   const [lightboxItem, setLightboxItem] = useState<GalleryItem | null>(null);
+  const [activeYoutubeVideo, setActiveYoutubeVideo] = useState<GalleryItem | null>(null);
   
   const thumbnailContainerRef = useRef<HTMLDivElement>(null);
   const autoplayTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -542,6 +516,72 @@ export default function GalleryView() {
           )}
         </AnimatePresence>
 
+        {/* J. Krishnamurti Video Archives Section */}
+        <div className="mt-20 border-t border-[#1A1D1C]/10 pt-16">
+          <div className="text-center mb-10">
+            <span className="text-[#F37021] font-amatic text-2xl font-bold tracking-widest uppercase">
+              Inquiry & Teachings
+            </span>
+            <h2 className="font-sketch text-3xl sm:text-5xl text-[#1A1D1C] mt-1 mb-3">
+              J. Krishnamurti Audio Archives
+            </h2>
+            <p className="font-hand text-lg sm:text-xl text-[#5A5C5A] max-w-2xl mx-auto leading-relaxed">
+              To learn, you must have a free, quiet, and unconditioned mind. Explore these foundational video inquiries on the true nature of learning and right education.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto pb-10">
+            {JK_VIDEOS.map((item, index) => {
+              const videoId = getYoutubeId(item.imageSrc);
+              const thumbUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+              return (
+                <div
+                  key={item.title}
+                  id={`jk-video-card-${index}`}
+                  onClick={() => setActiveYoutubeVideo(item)}
+                  className="bg-white rounded-2xl overflow-hidden border border-[#1A1D1C]/15 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col justify-between h-[380px] group"
+                >
+                  {/* YouTube Thumbnail Preview */}
+                  <div className="relative w-full h-1/2 overflow-hidden bg-stone-900 flex items-center justify-center">
+                    <img
+                      src={thumbUrl}
+                      alt={item.title}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      loading="lazy"
+                    />
+                    {/* Dark translucent overlay */}
+                    <div className="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+                      {/* Play Button */}
+                      <div className="w-12 h-12 rounded-full bg-white/95 text-[#F37021] flex items-center justify-center shadow-md transform group-hover:scale-110 active:scale-95 transition-all duration-300">
+                        <Play className="w-6 h-6 fill-current ml-0.5" />
+                      </div>
+                    </div>
+                    {/* YouTube Logo small floating badge */}
+                    <span className="absolute bottom-2 right-2 bg-red-600 text-white font-mono text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded shadow-sm">
+                      YouTube
+                    </span>
+                  </div>
+
+                  {/* Descriptions card bottom */}
+                  <div className="p-5 bg-white border-t border-[#1A1D1C]/10 flex-grow flex flex-col justify-between font-hand">
+                    <div>
+                      <div className="flex items-center gap-1 text-[#F37021] font-amatic text-lg font-bold uppercase tracking-wider mb-0.5">
+                        <span>Dialogue {index + 1}</span>
+                      </div>
+                      <h3 className="font-sketch text-lg text-espresso mb-1 border-b border-dashed border-stone-100 pb-1 line-clamp-2">
+                        {item.title}
+                      </h3>
+                      <p className="font-hand text-base text-[#5A5C5A] line-clamp-3 leading-relaxed">
+                        {item.description}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
         {/* Note / Disclaimer footer section */}
         <div className="max-w-xl mx-auto bg-white text-center p-5 rounded-2xl border border-[#1A1D1C]/15 shadow-sm mt-10">
           <p className="font-hand text-lg text-[#1a1d1c]/80 leading-relaxed">
@@ -619,6 +659,76 @@ export default function GalleryView() {
                       <span>© ARCHIVE ENTRY</span>
                       <span>SEC_R_EDU</span>
                     </div>
+                  </div>
+                </div>
+
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* YouTube Video Lightbox Modal */}
+        <AnimatePresence>
+          {activeYoutubeVideo && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-50 bg-[#1A1D1C]/95 backdrop-blur-md flex items-center justify-center p-4 sm:p-6"
+              onClick={() => setActiveYoutubeVideo(null)}
+              id="youtube-lightbox"
+            >
+              <button
+                onClick={() => setActiveYoutubeVideo(null)}
+                className="absolute top-6 right-6 p-2 rounded-full bg-white/10 hover:bg-white text-white hover:text-[#1A1D1C] transition-colors z-50 shadow-lg"
+                title="Close video"
+                id="youtube-lightbox-close"
+              >
+                <X className="w-6 h-6" />
+              </button>
+
+              <motion.div
+                initial={{ scale: 0.95, y: 15 }}
+                animate={{ scale: 1, y: 0 }}
+                exit={{ scale: 0.95, y: 15 }}
+                className="bg-white max-w-4xl w-full rounded-2xl overflow-hidden shadow-2xl border border-[#1A1D1C] flex flex-col"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Responsive 16:9 Video Wrapper */}
+                <div className="aspect-video bg-black relative">
+                  {(() => {
+                    const videoId = getYoutubeId(activeYoutubeVideo.imageSrc);
+                    return (
+                      <iframe
+                        src={`https://www.youtube.com/embed/${videoId}?autoplay=1`}
+                        title={activeYoutubeVideo.title}
+                        className="w-full h-full border-0 absolute inset-0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    );
+                  })()}
+                </div>
+
+                {/* Video descriptions */}
+                <div className="p-6 sm:p-8 bg-white text-espresso">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-[#F37021] font-amatic text-xl font-bold tracking-widest uppercase">
+                      J. Krishnamurti Teachings
+                    </span>
+                    <span className="w-3.5 h-[1.5px] bg-amber-400" />
+                    <span className="text-stone-400 font-mono text-[10px]">VIDEO ARCHIVE</span>
+                  </div>
+                  <h3 className="font-sketch text-2xl sm:text-3xl text-espresso mb-2">
+                    {activeYoutubeVideo.title}
+                  </h3>
+                  <p className="font-hand text-base sm:text-lg text-[#3A3A3A] leading-relaxed">
+                    {activeYoutubeVideo.description}
+                  </p>
+                  
+                  <div className="mt-5 border-t border-stone-100 pt-4 flex justify-between items-center text-xs font-hand text-[#7F817F]">
+                    <span>PRODUCED BY</span>
+                    <strong className="text-espresso">J. Krishnamurti Foundation</strong>
                   </div>
                 </div>
 
