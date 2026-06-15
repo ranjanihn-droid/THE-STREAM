@@ -88,7 +88,7 @@ export default function Footer({ setActiveTab }: FooterProps) {
             Coordinator Assistance
           </h5>
           
-          <div className="space-y-4 font-hand text-lg text-[#5A5C5A]">
+          <div className="space-y-4 font-hand text-lg text-[#5A5C5A] uppercase">
             <p className="flex items-center gap-2.5">
               <Phone className="w-4.5 h-4.5 text-[#F37021] shrink-0" />
               <span>Contact: {CONTACT_INFO.contactPerson}</span>
@@ -127,8 +127,16 @@ export default function Footer({ setActiveTab }: FooterProps) {
       {/* Corporate Metadata bottom bar */}
       <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4 text-xs font-hand text-[#5A5C5A]">
         
-        <div className="text-center sm:text-left">
+        <div className="text-center sm:text-left flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
           <p>© {new Date().getFullYear()} {CONTACT_INFO.legalEntity}. All human rights observed.</p>
+          <span className="hidden sm:inline text-gray-300">|</span>
+          <button
+            onClick={() => { setActiveTab("staff"); scrollToTop(); }}
+            className="hover:text-[#F37021] underline cursor-pointer transition-colors focus:outline-none"
+            id="staff-portal-button"
+          >
+            Staff Portal
+          </button>
         </div>
 
         <button 

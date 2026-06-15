@@ -12,6 +12,7 @@ import ProgramsView from "./components/ProgramsView";
 import PlacementView from "./components/PlacementView";
 import GalleryView from "./components/GalleryView";
 import ContactView from "./components/ContactView";
+import StaffPortalView from "./components/StaffPortalView";
 import Footer from "./components/Footer";
 
 export default function App() {
@@ -25,6 +26,7 @@ export default function App() {
       placement: "Alternative School Placements & Partners | The Stream Bangalore",
       gallery: "Alternative Practical Learning Gallery | The Stream",
       contact: "Contact Us & Alternative Education Admissions | The Stream",
+      staff: "Staff Room Facilitators Portal | The Stream Bangalore",
     };
     document.title = titles[activeTab] || "The Stream — Educator Training Programs, Bangalore";
   }, [activeTab]);
@@ -81,6 +83,12 @@ export default function App() {
         return (
           <motion.div key="contact" variants={tabVariants} initial="initial" animate="animate" exit="exit">
             <ContactView />
+          </motion.div>
+        );
+      case "staff":
+        return (
+          <motion.div key="staff" variants={tabVariants} initial="initial" animate="animate" exit="exit">
+            <StaffPortalView />
           </motion.div>
         );
       default:

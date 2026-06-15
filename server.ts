@@ -1,5 +1,6 @@
 import express from "express";
 import path from "path";
+import crypto from "crypto";
 import { createServer as createViteServer } from "vite";
 
 // In-memory cache to store resolved OneDrive direct URLs so we only do the slow fetch once
@@ -50,10 +51,12 @@ async function startServer() {
           const buffer = Buffer.from(arrayBuffer);
           return res.send(buffer);
         } else {
-          console.error(`[Favicon] Fetch failed with status: ${logoResponse.status}`);
+          console.warn(`[Favicon] Fetch failed with status: ${logoResponse.status}. Redirecting browser directly.`);
+          return res.redirect(302, resolvedUrl);
         }
       } catch (error: any) {
-        console.error("[Favicon] Error proxying logo stream:", error.message);
+        console.error("[Favicon] Error proxying logo stream, redirecting browser:", error.message);
+        return res.redirect(302, resolvedUrl);
       }
     }
 
@@ -298,6 +301,174 @@ Sitemap: https://www.thestream.co.in/sitemap.xml`);
     <priority>1.0</priority>
   </url>
 </urlset>`);
+  });
+
+  // In-memory array to store dynamic reflection enquiries from visitors
+  const contactEnquiries = [
+    {
+      id: "enq-1",
+      name: "Ravi Kumar",
+      email: "ravi.kumar@gmail.com",
+      phone: "+91 98765 43210",
+      journeyText: "I've been teaching Physics in standard curriculum boards for 7 years, but always felt constrained by examinations-led structures. Resonating heavily with alternative spaces, I would love to join your upcoming 9-Month Alternative Educator Track.",
+      cvName: "Ravi_Kumar_CV_Physics.pdf",
+      date: "2026-06-13"
+    },
+    {
+      id: "enq-2",
+      name: "Meera Hegde",
+      email: "meera.hegde@outlook.com",
+      phone: "+91 88877 66554",
+      journeyText: "As an organic gardener and parent who runs home-schooling circle modules, I feel standard institutions are deeply conditioned. Sreenivasan's essays on Right Education were a breath of fresh air. I look forward to participating in your parent-practitioner dialogues.",
+      cvName: null,
+      date: "2026-06-12"
+    },
+    {
+      id: "enq-3",
+      name: "Siddharth V.",
+      email: "sid.v@thestream.co.in",
+      phone: "+91 91234 56789",
+      journeyText: "Compiling my interest to transition into democratic school systems after reading Krishnamurti and Neill. Excited to understand your weekend workshops and school design consulting.",
+      cvName: "Siddharth_Syllabus_Outline.docx",
+      date: "2026-06-14"
+    }
+  ];
+
+  // In-memory registry to verify email/phone one-time passcodes (OTPs)
+  const verificationCodes = new Map<string, string>();
+
+  // OTP Generation trigger
+  app.post("/api/verify/send-otp", (req, res) => {
+    const { target, type } = req.body;
+    if (!target) {
+      return res.status(400).json({ error: "Verification target configuration is missing" });
+    }
+    const targetClean = String(target).toLowerCase().trim();
+    const code = Math.floor(1000 + Math.random() * 9000).toString();
+    verificationCodes.set(targetClean, code);
+    
+    console.log(`[Verification Server] Code ${code} registered for ${type}: ${targetClean}`);
+    
+    res.json({
+      success: true,
+      simulatedCode: code,
+      message: `Verification code registered for ${targetClean}.`
+    });
+  });
+
+  // OTP Verification check
+  app.post("/api/verify/check-otp", (req, res) => {
+    const { target, code } = req.body;
+    if (!target || !code) {
+      return res.status(400).json({ error: "Target and code are required for verification verification" });
+    }
+    const targetClean = String(target).toLowerCase().trim();
+    const activeCode = verificationCodes.get(targetClean);
+
+    if (activeCode && activeCode === String(code).trim()) {
+      verificationCodes.delete(targetClean); // consume once verified
+      return res.json({ success: true, message: "Channel verified successfully." });
+    }
+
+    res.status(400).json({ error: "Invalid verification code. Please check and retry." });
+  });
+
+  // Submit an enquiry
+  app.post("/api/enquiries", (req, res) => {
+    const { name, email, phone, journeyText, cvName, cvBase64, images } = req.body;
+    if (!name || !email || !journeyText) {
+      return res.status(400).json({ error: "Name, email, and journey text are required" });
+    }
+    const newEnquiry = {
+      id: "enq-" + Date.now(),
+      name: String(name).trim(),
+      email: String(email).trim(),
+      phone: phone ? String(phone).trim() : "Not provided",
+      journeyText: String(journeyText).trim(),
+      cvName: cvName ? String(cvName).trim() : null,
+      cvBase64: cvBase64 || null,
+      images: Array.isArray(images) ? images : [],
+      date: new Date().toISOString().split("T")[0]
+    };
+    contactEnquiries.push(newEnquiry);
+    console.log("[Enquiry API] New Submission added:", newEnquiry);
+    res.json({ success: true, enquiry: newEnquiry });
+  });
+
+  // Fetch enquiries list (accessible on staff portal)
+  app.get("/api/staff/enquiries", (req, res) => {
+    res.json({ success: true, enquiries: [...contactEnquiries].reverse() });
+  });
+
+  // Delete an enquiry
+  app.delete("/api/staff/enquiries/:id", (req, res) => {
+    const { id } = req.params;
+    const index = contactEnquiries.findIndex(e => e.id === id);
+    if (index !== -1) {
+      const deleted = contactEnquiries.splice(index, 1);
+      console.log(`[Enquiry API] Deleted Enquiry with ID ${id}:`, deleted[0]);
+      return res.json({ success: true, message: "Enquiry deleted successfully.", id });
+    }
+    res.status(404).json({ error: "Enquiry not found" });
+  });
+
+  // Forward an enquiry to another email
+  app.post("/api/staff/enquiries/:id/forward", (req, res) => {
+    const { id } = req.params;
+    const { forwardEmail } = req.body;
+    
+    if (!forwardEmail) {
+      return res.status(400).json({ error: "Forward email target is required" });
+    }
+    
+    const enquiry = contactEnquiries.find(e => e.id === id);
+    if (!enquiry) {
+      // Look up in some mock cache or local store if not found in active contactEnquiries
+      return res.status(404).json({ error: "Enquiry not found in core memory." });
+    }
+    
+    console.log(`[Enquiry API] Forwarded enquiry ID ${id} of "${enquiry.name}" to: ${forwardEmail}`);
+    
+    res.json({ 
+      success: true, 
+      message: `Enquiry successfully forwarded to ${forwardEmail}.`,
+      recipient: forwardEmail
+    });
+  });
+
+  // Secure Staff Login endpoint comparing incoming credentials with secure hashes
+  app.post("/api/staff/login", (req, res) => {
+    const { username, password } = req.body;
+    
+    if (!username || !password) {
+      return res.status(400).json({ success: false, error: "Username and password are required" });
+    }
+
+    try {
+      // Clean up whitespace to prevent minor spacing typos
+      const cleanUsername = String(username).trim();
+      const cleanPassword = String(password).trim();
+
+      const userHash = crypto.createHash("sha256").update(cleanUsername).digest("hex");
+      const pwdHash = crypto.createHash("sha256").update(cleanPassword).digest("hex");
+
+      const TARGET_USER_HASH = "c945f87a81600718fbc8cc0a9c034b5c951411f9fda0fe92d16a6280d80b3be8";
+      const TARGET_PWD_HASH = "af7ebc2176efc575e132e2fb1a00533a4fe45e1fa469a1a1eb05b95da75df21f";
+
+      if (userHash === TARGET_USER_HASH && pwdHash === TARGET_PWD_HASH) {
+        return res.json({
+          success: true,
+          token: "stream_staff_session_" + crypto.randomBytes(16).toString("hex"),
+          username: cleanUsername,
+          role: "Administrator"
+        });
+      } else {
+        return res.status(401).json({ success: false, error: "Incorrect staff username or password." });
+      }
+    } catch (e: any) {
+      console.error("[Login API] Verification error:", e.message);
+      return res.status(500).json({ success: false, error: "Authentication system error" });
+    }
   });
 
   // Health check
