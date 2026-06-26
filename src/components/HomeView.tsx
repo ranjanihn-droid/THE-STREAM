@@ -1,9 +1,49 @@
-import { ArrowRight, Sprout, HeartHandshake } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
+import { ArrowRight, Sprout, HeartHandshake, ChevronLeft, ChevronRight, Quote, Pause, Play } from "lucide-react";
+import { motion, AnimatePresence } from "motion/react";
 import { HOME_INTRO, IMAGES } from "../data";
 import StreamLogo from "./StreamLogo";
 
 // Import real local uploaded high-resolution assets
-import wideBannerImg from "../assets/images/You have to be your own Teacher'-1.png";
+import wideBannerImg from "../assets/images/K-teachers.png";
+
+const EDUCATIONAL_QUOTES = [
+  {
+    philosopher: "Swami Vivekananda",
+    role: "Spiritual Visionary & Integral Educator",
+    quote: "Education is the manifestation of the perfection already in man. We want that education by which character is formed, strength of mind is increased, the intellect is expanded, and by which one can stand on one's own feet.",
+    subQuote: "The very essence of education is concentration of mind, not the collecting of facts.",
+    accentColor: "#D97706",
+  },
+  {
+    philosopher: "J. Krishnamurti",
+    role: "Philosopher & Founder of Brockwood Park & Rishi Valley",
+    quote: "There is no end to education. It is not that you read a book, pass an examination, and finish with education. The whole of life, from the moment you are born to the moment you die, is a process of learning.",
+    subQuote: "To understand life is to understand ourselves, and that is both the beginning and the end of education.",
+    accentColor: "#F37021",
+  },
+  {
+    philosopher: "Rabindranath Tagore",
+    role: "Nobel Laureate & Founder of Santiniketan (Visva-Bharati)",
+    quote: "The highest education is that which does not merely give us information but makes our life in harmony with all existence.",
+    subQuote: "Don't limit a child to your own learning, for he was born in another time.",
+    accentColor: "#059669",
+  },
+  {
+    philosopher: "Philosophy of A. S. Neill",
+    role: "Pioneer of Summerhill & Self-Directed Education",
+    quote: "The aim of life is to find happiness, which means to find interest. Education should be a preparation for life, not just for examinations.",
+    subQuote: "I would rather Summerhill produced a happy street cleaner than a neurotic scholar.",
+    accentColor: "#2563EB",
+  },
+  {
+    philosopher: "Steiner Waldorf (Rudolf Steiner)",
+    role: "Founder of Waldorf Education & Anthroposophy",
+    quote: "Receive the children in reverence, educate them in love, and send them forth in freedom.",
+    subQuote: "Our highest endeavor must be to develop free human beings who are able of themselves to impart purpose and direction to their lives.",
+    accentColor: "#7C3AED",
+  }
+];
 
 interface HomeViewProps {
   onExplorePrograms: () => void;
@@ -12,6 +52,26 @@ interface HomeViewProps {
 export default function HomeView({ onExplorePrograms }: HomeViewProps) {
   const wideDirectUrl = wideBannerImg;
   const mobileDirectUrl = wideBannerImg;
+
+  const [currentQuoteIdx, setCurrentQuoteIdx] = useState(0);
+  const [isAutoplayActive, setIsAutoplayActive] = useState(true);
+
+  const nextQuote = useCallback(() => {
+    setCurrentQuoteIdx((prev) => (prev + 1) % EDUCATIONAL_QUOTES.length);
+  }, []);
+
+  const prevQuote = useCallback(() => {
+    setCurrentQuoteIdx((prev) => (prev - 1 + EDUCATIONAL_QUOTES.length) % EDUCATIONAL_QUOTES.length);
+  }, []);
+
+  // Autoplay Effect
+  useEffect(() => {
+    if (!isAutoplayActive) return;
+    const interval = setInterval(() => {
+      nextQuote();
+    }, 8000); // Mindful pause of 8 seconds per quote
+    return () => clearInterval(interval);
+  }, [isAutoplayActive, nextQuote]);
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
@@ -23,10 +83,6 @@ export default function HomeView({ onExplorePrograms }: HomeViewProps) {
       >
         <div className="w-full max-w-7xl mx-auto flex flex-col items-center">
           
-          <span className="text-[#F37021] font-amatic text-2xl sm:text-3xl font-bold tracking-widest uppercase mb-6 block text-center">
-            The Foundation of Inquiry
-          </span>
- 
           {/* Clean full-bleed responsive inspiration image hero container */}
           <div className="w-full max-w-5xl flex items-center justify-center relative mb-10">
             <picture className="w-full h-full block">
@@ -143,6 +199,136 @@ export default function HomeView({ onExplorePrograms }: HomeViewProps) {
           </div>
         </div>
 
+      </section>
+
+      {/* 🎡 Educational Philosophies Carousel Section */}
+      <section className="w-full bg-[#FAF9F6] py-16 px-6 border-b border-[#F37021]/30 overflow-hidden" id="quotes-carousel">
+        <div className="w-full max-w-5xl mx-auto">
+          
+          <div className="text-center mb-10 space-y-3">
+            <h2 className="font-sketch text-3xl sm:text-4xl text-espresso">
+              Educational Wisdom & Visions
+            </h2>
+            <div className="w-24 h-1 bg-[#F37021] mx-auto rounded-full mt-2" />
+          </div>
+
+          {/* Carousel Card Container */}
+          <div className="relative bg-white border-2 border-espresso rounded-2xl p-6 sm:p-10 shadow-lg overflow-hidden min-h-[420px] sm:min-h-[340px] flex flex-col justify-between">
+            
+            {/* Background Decorative Quote Mark */}
+            <div className="absolute right-6 top-6 text-espresso/5 select-none pointer-events-none">
+              <Quote className="w-32 h-32" />
+            </div>
+
+            {/* Quote Slide with Fade Animation */}
+            <div className="relative z-10 flex-1 flex flex-col justify-center">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={currentQuoteIdx}
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -15 }}
+                  transition={{ duration: 0.3 }}
+                  className="space-y-6"
+                >
+                  <div className="space-y-1">
+                    <span 
+                      className="text-xs font-mono px-3 py-1 rounded-full uppercase tracking-wider font-semibold inline-block"
+                      style={{ 
+                        backgroundColor: `${EDUCATIONAL_QUOTES[currentQuoteIdx].accentColor}15`, 
+                        color: EDUCATIONAL_QUOTES[currentQuoteIdx].accentColor,
+                        border: `1px solid ${EDUCATIONAL_QUOTES[currentQuoteIdx].accentColor}25`
+                      }}
+                    >
+                      {EDUCATIONAL_QUOTES[currentQuoteIdx].role}
+                    </span>
+                    <h3 className="font-sketch text-2xl sm:text-3xl text-espresso mt-2">
+                      {EDUCATIONAL_QUOTES[currentQuoteIdx].philosopher}
+                    </h3>
+                  </div>
+
+                  <div className="space-y-4">
+                    <p className="font-hand text-xl sm:text-2xl text-espresso/90 leading-relaxed italic">
+                      "{EDUCATIONAL_QUOTES[currentQuoteIdx].quote}"
+                    </p>
+                    {EDUCATIONAL_QUOTES[currentQuoteIdx].subQuote && (
+                      <p className="font-hand text-base sm:text-lg text-[#5A5C5A] border-l-2 pl-4 italic" style={{ borderColor: EDUCATIONAL_QUOTES[currentQuoteIdx].accentColor }}>
+                        "{EDUCATIONAL_QUOTES[currentQuoteIdx].subQuote}"
+                      </p>
+                    )}
+                  </div>
+                </motion.div>
+              </AnimatePresence>
+            </div>
+
+            {/* Bottom Controls Row */}
+            <div className="relative z-10 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-[#DDD9CE]/60 pt-6 mt-8">
+              
+              {/* Autoplay & Playback Indicator Status */}
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsAutoplayActive(!isAutoplayActive)}
+                  className="p-1.5 rounded-full hover:bg-stone-100 border border-stone-200 text-espresso cursor-pointer transition-colors"
+                  title={isAutoplayActive ? "Pause Autoplay" : "Start Autoplay"}
+                >
+                  {isAutoplayActive ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                </button>
+                <span className="text-xs font-mono text-gray-500 uppercase tracking-wider">
+                  {isAutoplayActive ? "Autoplay Active" : "Autoplay Paused"}
+                </span>
+              </div>
+
+              {/* Indicator dots */}
+              <div className="flex items-center gap-2">
+                {EDUCATIONAL_QUOTES.map((_, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => {
+                      setCurrentQuoteIdx(idx);
+                      setIsAutoplayActive(false); // Pause autoplay on manual click
+                    }}
+                    className={`h-2.5 rounded-full transition-all duration-300 cursor-pointer ${
+                      currentQuoteIdx === idx 
+                        ? "w-6 bg-[#F37021]" 
+                        : "w-2.5 bg-stone-200 hover:bg-stone-300"
+                    }`}
+                    title={`Go to quote ${idx + 1}`}
+                  />
+                ))}
+              </div>
+
+              {/* Navigation Arrows */}
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={prevQuote}
+                  className="p-2 border border-espresso/25 rounded-lg hover:border-espresso hover:bg-stone-50 text-espresso transition-all cursor-pointer"
+                  title="Previous quote"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={nextQuote}
+                  className="p-2 border border-espresso/25 rounded-lg hover:border-espresso hover:bg-stone-50 text-espresso transition-all cursor-pointer"
+                  title="Next quote"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+              </div>
+
+            </div>
+
+          </div>
+
+          {/* Alternative Schooling Insight Footer tag */}
+          <p className="text-center font-hand text-sm text-[#7F817F] mt-4 uppercase tracking-wider">
+            ❋ these voices form the fundamental inquiry of self-directed and organic learning ecosystems ❋
+          </p>
+
+        </div>
       </section>
 
     </div>
