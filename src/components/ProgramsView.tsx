@@ -1,6 +1,7 @@
-import { BookOpen, Calendar, MapPin, Sparkles, Heart, Brain, Users, Compass, HelpCircle, ExternalLink } from "lucide-react";
+import { BookOpen, Calendar, MapPin, Sparkles, Heart, Brain, Users, Compass, HelpCircle, ExternalLink, Award } from "lucide-react";
 import { CORE_PROGRAM, INCLUSIVE_PROGRAM, PARENT_PROGRAM } from "../data";
 import { motion } from "motion/react";
+import birlaLogo from "../assets/images/birla_institute_logo_new_1782713373137.jpg";
 
 export default function ProgramsView() {
   return (
@@ -50,7 +51,7 @@ export default function ProgramsView() {
           className="mb-16 bg-[#EDEAE2] rounded-2xl p-6 sm:p-8 border border-dashed border-[#F37021]/30 shadow-sm relative overflow-hidden"
         >
           <div className="absolute top-[-20px] right-[-20px] text-[#F37021]/5 select-none font-sketch text-[100px] leading-none pointer-events-none">
-            STREAM
+            CHALKSTREAM
           </div>
           <div className="flex flex-col md:flex-row items-start md:items-center gap-6 relative z-10">
             <div className="p-4 bg-[#F37021]/10 rounded-full text-[#F37021] shrink-0">
@@ -61,7 +62,7 @@ export default function ProgramsView() {
                 Our Foundational Framework
               </h3>
               <p className="font-hand text-lg sm:text-xl text-[#3A3A3A] leading-relaxed">
-                Our offerings, facilitated in association with NeeAr (STREAM _ NeeAr_TTP), are designed around a powerful developmental framework: <strong className="text-[#F37021] font-sketch text-xl">MSKTW</strong> (Mindset, Skill set, Knowledge set, Tool set, and Wisdom set).
+                Our offerings, facilitated in association with NeeAr (CHALKSTREAM _ NeeAr_TTP), are designed around a powerful developmental framework: <strong className="text-[#F37021] font-sketch text-xl">MSKTW</strong> (Mindset, Skill set, Knowledge set, Tool set, and Wisdom set).
               </p>
             </div>
           </div>
@@ -93,9 +94,35 @@ export default function ProgramsView() {
             <p className="font-hand text-xl sm:text-2xl text-[#1A1D1C] leading-relaxed mb-4">
               {CORE_PROGRAM.description}
             </p>
-            <p className="font-hand text-lg text-[#5A5C5A] leading-relaxed italic">
+            <p className="font-hand text-lg text-[#5A5C5A] leading-relaxed italic mb-8">
               {CORE_PROGRAM.framework}
             </p>
+
+            {/* Accreditation Partner Box */}
+            <div className="mt-8 p-6 bg-[#FAF9F6] border border-[#1A1D1C]/15 rounded-2xl flex flex-col md:flex-row items-center gap-6 relative z-10 hover:shadow-md transition-shadow">
+              <div className="w-24 h-24 sm:w-28 sm:h-28 shrink-0 bg-white p-2 rounded-full border border-[#1A1D1C]/10 flex items-center justify-center shadow-inner">
+                <img 
+                  src={birlaLogo} 
+                  alt="M. P. Birla Institute of Fundamental Research, Bangalore Logo" 
+                  referrerPolicy="no-referrer"
+                  className="w-full h-full object-contain"
+                />
+              </div>
+              <div className="text-center md:text-left flex-1">
+                <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 mb-1.5">
+                  <Award className="w-4 h-4 text-[#F37021]" />
+                  <span className="text-xs font-mono text-[#F37021] uppercase tracking-widest font-bold">
+                    Official Accreditation Partner
+                  </span>
+                </div>
+                <h4 className="font-sketch text-xl sm:text-2xl text-espresso mb-2">
+                  M. P. Birla Institute of Fundamental Research, Bangalore
+                </h4>
+                <p className="font-hand text-base sm:text-lg text-[#5A5C5A] leading-relaxed">
+                  Our flagship 9-month Educator Certification Program is officially accredited in collaboration with the prestigious <strong>M. P. Birla Institute of Fundamental Research</strong>. This joint association assures that our training curriculum conforms to strict standards of academic rigor, observational accuracy, and holistic inquiry-led education.
+                </p>
+              </div>
+            </div>
           </div>
 
           {/* ⏳ Vertical Phases Details Timeline */}

@@ -20,15 +20,15 @@ export default function App() {
 
   useEffect(() => {
     const titles: Record<string, string> = {
-      home: "The Stream | Educator Training Programs, Bangalore",
-      about: "About Us & J. Krishnamurti Philosophy | The Stream Teacher Training",
-      programs: "Alternative Educator Certification Programs | The Stream_NeeAr_TTP",
-      placement: "Alternative School Placements & Partners | The Stream Bangalore",
-      gallery: "Alternative Practical Learning Gallery | The Stream",
-      contact: "Contact Us & Alternative Education Admissions | The Stream",
-      staff: "Staff Room Facilitators Portal | The Stream Bangalore",
+      home: "Chalkstream Educators | Teacher Training Programs, Bangalore",
+      about: "About Us & J. Krishnamurti Philosophy | Chalkstream Educators",
+      programs: "Alternative Educator Certification Programs | Chalkstream_NeeAr_TTP",
+      placement: "Alternative School Placements & Partners | Chalkstream Bangalore",
+      gallery: "Alternative Practical Learning Gallery | Chalkstream",
+      contact: "Contact Us & Alternative Education Admissions | Chalkstream",
+      staff: "Staff Room Facilitators Portal | Chalkstream Bangalore",
     };
-    document.title = titles[activeTab] || "The Stream — Educator Training Programs, Bangalore";
+    document.title = titles[activeTab] || "Chalkstream Educators — Teacher Training Programs, Bangalore";
   }, [activeTab]);
 
   const handleSetActiveTab = (tab: string) => {

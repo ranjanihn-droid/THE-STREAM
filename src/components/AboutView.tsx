@@ -99,7 +99,7 @@ export default function AboutView() {
 
               <div className="mt-8 pt-4 border-t border-dashed border-[#DFDCDB] flex items-center justify-between text-xs text-[#828482] font-mono">
                 <span>FOUNDING DIRECTORS</span>
-                <span>THE CHALK & STREAM PVT LTD</span>
+                <span>CHALKSTREAM EDUCATORS PVT LTD</span>
               </div>
             </div>
 

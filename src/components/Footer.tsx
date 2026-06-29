@@ -18,7 +18,7 @@ export default function Footer({ setActiveTab }: FooterProps) {
         <div className="md:col-span-5 flex flex-col justify-between">
           <div>
             <h4 className="font-sketch text-3xl text-[#F37021] tracking-wide mb-3">
-              The Stream
+              Chalkstream Educators
             </h4>
             <span className="font-amatic text-sm text-[#5A5C5A] tracking-widest uppercase font-bold block mb-4">
               Educator Training Ground & Dialogue Hub
@@ -26,10 +26,6 @@ export default function Footer({ setActiveTab }: FooterProps) {
             <p className="font-hand text-lg text-[#5A5C5A] leading-relaxed max-w-sm">
               An immersive 9-month preparation journey into Right Education and fearless pedagogy, preparing conscious teachers for Aranyaani, Aarohi, and democratic learning spaces in Bangalore.
             </p>
-          </div>
-          
-          <div className="mt-8 font-hand text-xs text-[#5A5C5A]">
-            <span>An initiative of the registered charity <strong>The F.O.R.E. (Foundation for Right Education) Trust</strong>.</span>
           </div>
         </div>
 
@@ -115,7 +111,7 @@ export default function Footer({ setActiveTab }: FooterProps) {
               Curriculum Facilitators
             </span>
             <div className="font-sketch text-sm text-[#1A1D1C] flex flex-col gap-0.5">
-              <span>The Stream Education Circle</span>
+              <span>Chalkstream Educators Circle</span>
               <span className="font-hand text-xs text-[#5A5C5A] text-center">&amp;</span>
               <span>NeeAr team</span>
             </div>

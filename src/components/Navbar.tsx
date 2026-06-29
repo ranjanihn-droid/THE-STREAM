@@ -35,7 +35,7 @@ export default function Navbar({ activeTab, setActiveTab }: NavbarProps) {
             <button
               onClick={() => handleTabClick("home")}
               className="text-left group focus:outline-none"
-              aria-label="The Stream Home"
+              aria-label="Chalkstream Educators Home"
             >
               <StreamLogo inverse={false} />
             </button>

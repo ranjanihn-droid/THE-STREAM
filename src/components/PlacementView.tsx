@@ -1,6 +1,7 @@
-import { Handshake, Compass, Globe, CheckCircle, ExternalLink, ArrowUpRight, MapPin } from "lucide-react";
+import { Handshake, Compass, Globe, CheckCircle, ExternalLink, ArrowUpRight, MapPin, Award } from "lucide-react";
 import { PLACEMENT_CONTENT } from "../data";
 import { motion } from "motion/react";
+import birlaLogo from "../assets/images/birla_institute_logo_new_1782713373137.jpg";
 
 interface PlacementViewProps {
   onContactClick: () => void;
@@ -33,6 +34,32 @@ export default function PlacementView({ onContactClick }: PlacementViewProps) {
           <p className="font-hand text-lg sm:text-xl text-[#5E605E] leading-relaxed">
             We operate in concert with progressive schools who actively seek to eliminate the conventional mechanisms of fear, comparisons, and grading, replacing them with observation circles, nature walks, and unburdensome exploration.
           </p>
+        </section>
+
+        {/* 🏆 Accreditation Partner Section */}
+        <section className="mb-20 bg-white rounded-xl p-6 sm:p-10 border border-ochre/20 shadow-sm flex flex-col md:flex-row items-center gap-8 hover:shadow-md transition-shadow">
+          <div className="w-28 h-28 sm:w-32 sm:h-32 shrink-0 bg-[#FAF9F5] p-2.5 rounded-full border border-ochre/20 flex items-center justify-center shadow-inner">
+            <img 
+              src={birlaLogo} 
+              alt="M. P. Birla Institute of Fundamental Research, Bangalore Logo" 
+              referrerPolicy="no-referrer"
+              className="w-full h-full object-contain"
+            />
+          </div>
+          <div className="text-center md:text-left flex-1">
+            <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 mb-2">
+              <Award className="w-5 h-5 text-terracotta" />
+              <span className="text-xs font-mono text-terracotta uppercase tracking-widest font-bold">
+                Affiliation & Accreditation Partner
+              </span>
+            </div>
+            <h3 className="font-sketch text-2xl sm:text-3xl text-espresso mb-3">
+              M. P. Birla Institute of Fundamental Research, Bangalore
+            </h3>
+            <p className="font-hand text-base sm:text-lg text-[#5A5C5A] leading-relaxed">
+              Our professional training pathways and flagship certifications are officially validated and accredited in collaboration with the renowned <strong>M. P. Birla Institute of Fundamental Research, Bangalore</strong>. This academic partnership ensures that our graduates enter the teaching landscape with a highly respected, meticulously evaluated certification that is recognized by progressive schools across the country.
+            </p>
+          </div>
         </section>
 
         {/* 🏫 School Grid / Logo Presentation */}

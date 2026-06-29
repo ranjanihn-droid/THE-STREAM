@@ -429,7 +429,7 @@ export default function StaffPortalView() {
   // Export Plan to Text File
   const handleExportPlan = (plan: DialoguePlan) => {
     const text = `================================================
-THE STREAM | STAFF EDUCATOR DIALOGUE PLANNER
+CHALKSTREAM EDUCATORS | STAFF EDUCATOR DIALOGUE PLANNER
 ================================================
 TITLE:         ${plan.title}
 FACILITATOR:   ${plan.facilitator}
@@ -596,7 +596,7 @@ Allow for silent pauses between responses. Focus on immediate self-observation.
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <h2 className="font-sketch text-3xl text-espresso">The Stream Staff Room</h2>
+                      <h2 className="font-sketch text-3xl text-espresso">Chalkstream Staff Room</h2>
                       <span className="bg-[#F37021] text-white px-2 py-0.5 rounded text-xs font-sans font-bold">Admin Portal</span>
                     </div>
                     <span className="font-hand text-lg text-slate-500 block">
