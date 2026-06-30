@@ -71,6 +71,16 @@ export default function GalleryView() {
       urls[item.imageSrc] = item.imageSrc;
     });
     setResolvedUrls(urls);
+
+    // Load Behold Instagram feed script dynamically
+    const existingScript = document.querySelector('script[src="https://w.behold.so/widget.js"]');
+    if (!existingScript) {
+      const script = document.createElement("script");
+      script.type = "module";
+      script.src = "https://w.behold.so/widget.js";
+      script.async = true;
+      document.head.appendChild(script);
+    }
   }, []);
   const [viewMode, setViewMode] = useState<"carousel" | "grid">("carousel");
   const [isPlaying, setIsPlaying] = useState(false);
@@ -579,6 +589,31 @@ export default function GalleryView() {
                 </div>
               );
             })}
+          </div>
+        </div>
+
+        {/* Live Instagram Feed with Behold Widget */}
+        <div className="mt-20 border-t-2 border-dashed border-[#1A1D1C]/15 pt-16" id="the-stream-instagram-section">
+          <div className="text-center mb-10">
+            <span className="text-[#F37021] font-amatic text-2xl font-bold tracking-widest uppercase">
+              Digital Reflections
+            </span>
+            <h2 className="font-sketch text-3xl sm:text-5xl text-[#1A1D1C] mt-1 mb-3">
+              Live Instagram Feed
+            </h2>
+            <p className="font-hand text-lg sm:text-xl text-[#5A5C5A] max-w-2xl mx-auto leading-relaxed">
+              Observe our daily moments, dialogue circles, and community reflections as they unfold in real-time. Follow our journey directly on Instagram.
+            </p>
+          </div>
+
+          <div className="max-w-5xl mx-auto bg-white p-4 sm:p-6 rounded-2xl border-2 border-espresso shadow-md overflow-hidden">
+            {/* Behold Custom Element Container */}
+            <div 
+              className="w-full min-h-[300px]"
+              dangerouslySetInnerHTML={{ 
+                __html: '<behold-widget feed-id="WZg7uNog2SEFxqs4uZ0r"></behold-widget>' 
+              }} 
+            />
           </div>
         </div>
 

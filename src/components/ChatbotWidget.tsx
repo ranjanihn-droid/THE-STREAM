@@ -171,7 +171,7 @@ export default function ChatbotWidget() {
         {
           id: "err-fallback-" + Date.now(),
           role: "model",
-          content: "I've carefully saved your enquiry in our local stream register. Our servers are syncing; if you require immediate responses, feel free to reach our WhatsApp support at +91 70229 73023!",
+          content: "I've carefully saved your enquiry in our local stream register. Our servers are syncing; if you require immediate assistance, feel free to submit an official interest reflection via our Join Us page, or email our coordination desk directly!",
           timestamp: new Date().toISOString()
         }
       ]);
