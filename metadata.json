@@ -1,6 +1,6 @@
 {
-  "name": "Chalkstream Educators",
-  "description": "A transformative 9-month journey into Right Education, unlearning, and pedagogical discovery.",
+  "name": "The Steam",
+  "description": "A transformative 12-month journey into Right Education, unlearning, and pedagogical discovery.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

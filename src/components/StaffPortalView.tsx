@@ -227,7 +227,7 @@ export default function StaffPortalView() {
           id: "n-1",
           topic: "Aranyaani School Placement Visit",
           content: "The coordinator Circle from Aranyaani Alternative School is visiting tomorrow at 10:00 AM to meet the senior TTP teacher batch. Please keep all reflection portfolios updated.",
-          postedBy: "Sreenivasan",
+          postedBy: "Srini",
           date: "2026-06-13",
           tag: "Placement"
         },
@@ -262,7 +262,7 @@ export default function StaffPortalView() {
           title: "Inquiry into Comparison & Competition",
           readingSource: "Letters to Schools, Chapter 4",
           dialoguePrompt: "Why does the mind constantly seek validation by comparing itself to another? Can there be true alternative learning when metrics of performance persist?",
-          facilitator: "Sreenivasan",
+          facilitator: "Srini",
           durationMins: 60
         },
         {
@@ -286,7 +286,7 @@ export default function StaffPortalView() {
         {
           id: "tc-1",
           name: "Devendra Swamy",
-          program: "9-Month Alternative Educator Track",
+          program: "12-Month Alternative Educator Track",
           status: "Assigned to Aranyaani",
           notes: "Strong background in organic farming integration and holistic science dialogues."
         },
@@ -300,7 +300,7 @@ export default function StaffPortalView() {
         {
           id: "tc-3",
           name: "Ananya Iyer",
-          program: "9-Month Alternative Educator Track",
+          program: "12-Month Alternative Educator Track",
           status: "Assigned to Aarohi",
           notes: "Completed internship modules; specializing in democratic dialogue facilitation and community arts."
         },
@@ -596,7 +596,7 @@ Allow for silent pauses between responses. Focus on immediate self-observation.
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <h2 className="font-sketch text-3xl text-espresso">Chalkstream Staff Room</h2>
+                      <h2 className="font-sketch text-3xl text-espresso">The Steam Staff Room</h2>
                       <span className="bg-[#F37021] text-white px-2 py-0.5 rounded text-xs font-sans font-bold">Admin Portal</span>
                     </div>
                     <span className="font-hand text-lg text-slate-500 block">
@@ -812,7 +812,7 @@ Allow for silent pauses between responses. Focus on immediate self-observation.
                             value={newNoticeBy}
                             onChange={(e) => setNewNoticeBy(e.target.value)}
                             className="w-full px-3 py-2 bg-white border-2 border-slate-200 focus:border-[#F37021] rounded font-hand text-md focus:outline-none"
-                            placeholder="e.g. Sreenivasan"
+                            placeholder="e.g. Srini"
                           />
                         </div>
 
@@ -900,7 +900,7 @@ Allow for silent pauses between responses. Focus on immediate self-observation.
                               value={planFacilitator}
                               onChange={(e) => setPlanFacilitator(e.target.value)}
                               className="w-full px-3 py-2 bg-white border-2 border-slate-200 focus:border-[#F37021] rounded font-hand text-md focus:outline-none"
-                              placeholder="e.g. Sreenivasan"
+                              placeholder="e.g. Srini"
                             />
                           </div>
                         </div>
@@ -1089,7 +1089,7 @@ Allow for silent pauses between responses. Focus on immediate self-observation.
                             Student Cohort Registration & Attendance
                           </h4>
                           <p className="text-sm text-[#5A5C5A] font-hand max-w-xs leading-relaxed">
-                            Private file to review admissions records of current 9-month teacher training cohort, candidate details & addresses.
+                            Private file to review admissions records of current 12-month teacher training cohort, candidate details & addresses.
                           </p>
                         </div>
                         <a

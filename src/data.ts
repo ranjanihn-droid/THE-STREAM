@@ -38,8 +38,8 @@ export const IMAGES = {
 
 export const HOME_INTRO = {
   headline: "Teaching-Learning Exploration for the Educator in You",
-  subHeadline: "A transformative 9-month journey into Right Education, facilitated by NeeAr.",
-  welcomeTitle: "Welcome to Chalkstream",
+  subHeadline: "A transformative 12-month journey into Right Education, facilitated by NeeAr.",
+  welcomeTitle: "Welcome to The Steam",
   welcomeText: "We are a dedicated training environment for individuals who are deeply drawn to the integrated \"teaching-learning\" process. To be a true educator is not merely to transmit academic information; it is to engage in a continuous, active state of observation and inner learning alongside the child.",
   welcomeSecondaryText: "In association with NeeAr—the primary facilitating body of our curriculum—we guide prospective and transitioning teachers through a rigorous journey of unlearning and pedagogical discovery. Our ultimate vision is to cultivate educators who are capable of stepping into environments that explore Right Education unbound by time."
 };
@@ -59,17 +59,17 @@ export const ABOUT_CONTENT = {
     {
       title: "The Founders",
       role: "Visionary & Administrative Leadership",
-      desc: "Founded by Murali Gotur and Srinivasan HS, operating under the organizational umbrella of Chalkstream Educators Pvt Ltd, dedicated to establishing fearless, conscious educational ecosystems."
+      desc: "Founded by Murali Gotur and Srinivasan HS, operating under the organizational umbrella of The Chalk & Stream Pvt Ltd, dedicated to establishing fearless, conscious educational ecosystems."
     }
   ]
 };
 
 export const CORE_PROGRAM = {
   title: "The Core Educator Training Program",
-  duration: "9-Month Certification Program",
+  duration: "12-Month Certification Program",
   tagline: "Facilitated in association with NeeAr (STREAM _ NeeAr_TTP)",
   framework: "Facilitated in association with NeeAr (STREAM _ NeeAr_TTP), designed around a powerful developmental framework: MSKTW (Mindset, Skill set, Knowledge set, Tool set, and Wisdom set).",
-  description: "This is a 9-months, course that culminates with a valued certification.",
+  description: "This is a 12-month course that culminates with a valued certification.",
   phase1Title: "Phase 1",
   phase1Duration: "The Core Modules",
   phase1Description: "A shared journey empowering teachers to evolve into mindful educators. You will build the right mindset, hone your skill sets for alternative education, and develop the right knowledge set regarding learning philosophy, methodology, and pedagogy. Participants will also learn the essential tool set needed for effective and efficient facilitation.",
@@ -102,7 +102,7 @@ export const PARENT_PROGRAM = {
 };
 
 export const PLACEMENT_CONTENT = {
-  intro: "The goal of Chalkstream Educators is not just to train, but to actively place conscious educators where they are needed most. Upon successful completion of the 9-month program and rigorous internship, our objective is to integrate our trainees into pioneering schools that create their own path to explore Right Education.",
+  intro: "The goal of The Steam is not just to train, but to actively place conscious educators where they are needed most. Upon successful completion of the 12-month program and rigorous internship, our objective is to integrate our trainees into pioneering schools that create their own path to explore Right Education.",
   ctaText: "If your school aligns with the philosophy of fearless, unhurried education, we welcome you to partner with our placement network.",
   schools: [
     {
@@ -181,11 +181,11 @@ export const JK_VIDEOS: GalleryItem[] = [
 ];
 
 export const CONTACT_INFO = {
-  title: "JOIN CHALKSTREAM",
+  title: "JOIN THE STEAM",
   subtitle: "Begin your journey into fearless, conscious education.",
   website: "www.thestream.co.in",
   email: "info@thestream.co.in",
-  contactPerson: "Sreenivasan",
+  contactPerson: "Srini",
   phone: "+91 70229 73023",
-  legalEntity: "CHALKSTREAM EDUCATORS PVT LTD"
+  legalEntity: "THE CHALK & STREAM PVT LTD"
 };

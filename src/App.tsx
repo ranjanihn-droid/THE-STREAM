@@ -20,15 +20,15 @@ export default function App() {
 
   useEffect(() => {
     const titles: Record<string, string> = {
-      home: "Chalkstream Educators | Teacher Training Programs, Bangalore",
-      about: "About Us & J. Krishnamurti Philosophy | Chalkstream Educators",
-      programs: "Alternative Educator Certification Programs | Chalkstream_NeeAr_TTP",
-      placement: "Alternative School Placements & Partners | Chalkstream Bangalore",
-      gallery: "Alternative Practical Learning Gallery | Chalkstream",
-      contact: "Contact Us & Alternative Education Admissions | Chalkstream",
-      staff: "Staff Room Facilitators Portal | Chalkstream Bangalore",
+      home: "The Steam | Teacher Training Programs, Bangalore",
+      about: "About Us & J. Krishnamurti Philosophy | The Steam",
+      programs: "Alternative Educator Certification Programs | The Steam_NeeAr_TTP",
+      placement: "Alternative School Placements & Partners | The Steam Bangalore",
+      gallery: "Alternative Practical Learning Gallery | The Steam",
+      contact: "Contact Us & Alternative Education Admissions | The Steam",
+      staff: "Staff Room Facilitators Portal | The Steam Bangalore",
     };
-    document.title = titles[activeTab] || "Chalkstream Educators — Teacher Training Programs, Bangalore";
+    document.title = titles[activeTab] || "The Steam — Teacher Training Programs, Bangalore";
   }, [activeTab]);
 
   const handleSetActiveTab = (tab: string) => {

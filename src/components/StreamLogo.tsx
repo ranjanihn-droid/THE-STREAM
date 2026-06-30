@@ -41,7 +41,7 @@ export default function StreamLogo({ className = "", inverse = false }: StreamLo
     <div className={`flex items-center select-none ${className}`}>
       <img
         src={resolvedUrl}
-        alt="Chalkstream Educators"
+        alt="The Steam"
         referrerPolicy="no-referrer"
         className="h-14 sm:h-16 md:h-20 lg:h-24 w-auto object-contain transition-transform duration-300 group-hover:scale-[1.03]"
         onError={(e) => {

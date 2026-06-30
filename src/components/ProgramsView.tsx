@@ -119,7 +119,7 @@ export default function ProgramsView() {
                   M. P. Birla Institute of Fundamental Research, Bangalore
                 </h4>
                 <p className="font-hand text-base sm:text-lg text-[#5A5C5A] leading-relaxed">
-                  Our flagship 9-month Educator Certification Program is officially accredited in collaboration with the prestigious <strong>M. P. Birla Institute of Fundamental Research</strong>. This joint association assures that our training curriculum conforms to strict standards of academic rigor, observational accuracy, and holistic inquiry-led education.
+                  Our flagship 12-month Educator Certification Program is officially accredited in collaboration with the prestigious <strong>M. P. Birla Institute of Fundamental Research</strong>. This joint association assures that our training curriculum conforms to strict standards of academic rigor, observational accuracy, and holistic inquiry-led education.
                 </p>
               </div>
             </div>
