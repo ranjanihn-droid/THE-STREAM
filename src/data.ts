@@ -39,7 +39,7 @@ export const IMAGES = {
 export const HOME_INTRO = {
   headline: "Teaching-Learning Exploration for the Educator in You",
   subHeadline: "A transformative 12-month journey into Right Education, facilitated by NeeAr.",
-  welcomeTitle: "Welcome to The Steam",
+  welcomeTitle: "Welcome to The Stream",
   welcomeText: "We are a dedicated training environment for individuals who are deeply drawn to the integrated \"teaching-learning\" process. To be a true educator is not merely to transmit academic information; it is to engage in a continuous, active state of observation and inner learning alongside the child.",
   welcomeSecondaryText: "In association with NeeAr—the primary facilitating body of our curriculum—we guide prospective and transitioning teachers through a rigorous journey of unlearning and pedagogical discovery. Our ultimate vision is to cultivate educators who are capable of stepping into environments that explore Right Education unbound by time."
 };
@@ -102,7 +102,7 @@ export const PARENT_PROGRAM = {
 };
 
 export const PLACEMENT_CONTENT = {
-  intro: "The goal of The Steam is not just to train, but to actively place conscious educators where they are needed most. Upon successful completion of the 12-month program and rigorous internship, our objective is to integrate our trainees into pioneering schools that create their own path to explore Right Education.",
+  intro: "The goal of The Stream is not just to train, but to actively place conscious educators where they are needed most. Upon successful completion of the 12-month program and rigorous internship, our objective is to integrate our trainees into pioneering schools that create their own path to explore Right Education.",
   ctaText: "If your school aligns with the philosophy of fearless, unhurried education, we welcome you to partner with our placement network.",
   schools: [
     {

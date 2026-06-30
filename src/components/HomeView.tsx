@@ -106,7 +106,7 @@ export default function HomeView({ onExplorePrograms }: HomeViewProps) {
               "So you have to be your own teacher and your own disciple, and there is no teacher outside, no saviour, no master; you yourself have to change, and therefore you have to learn to observe, to know yourself. This learning about yourself is a fascinating and joyous business."
             </p>
             <p className="font-hand text-lg text-[#5A5C5A] leading-relaxed max-w-xl mx-auto">
-              In association with <strong className="text-espresso font-semibold">NeeAr</strong>, this core belief underpins every module in <strong className="text-[#F37021]">The Steam</strong>. We do not manufacture teachers to follow automated templates; we nurture conscious educators who learn to look closely at themselves, the child, and the environment.
+              In association with <strong className="text-espresso font-semibold">NeeAr</strong>, this core belief underpins every module in <strong className="text-[#F37021]">The Stream</strong>. We do not manufacture teachers to follow automated templates; we nurture conscious educators who learn to look closely at themselves, the child, and the environment.
             </p>
 
             <div className="flex flex-wrap items-center justify-center gap-4 pt-4">
@@ -119,7 +119,7 @@ export default function HomeView({ onExplorePrograms }: HomeViewProps) {
               </button>
               
               <span className="font-mono text-xs text-[#7F817F] uppercase tracking-wider px-3 py-1 bg-stone-50 border border-stone-200/50 rounded-full">
-                THE STEAM & NeeAr TTP
+                THE STREAM & NeeAr TTP
               </span>
             </div>
           </div>

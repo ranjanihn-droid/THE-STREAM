@@ -14,21 +14,22 @@ import GalleryView from "./components/GalleryView";
 import ContactView from "./components/ContactView";
 import StaffPortalView from "./components/StaffPortalView";
 import Footer from "./components/Footer";
+import ChatbotWidget from "./components/ChatbotWidget";
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<string>("home");
 
   useEffect(() => {
     const titles: Record<string, string> = {
-      home: "The Steam | Teacher Training Programs, Bangalore",
-      about: "About Us & J. Krishnamurti Philosophy | The Steam",
-      programs: "Alternative Educator Certification Programs | The Steam_NeeAr_TTP",
-      placement: "Alternative School Placements & Partners | The Steam Bangalore",
-      gallery: "Alternative Practical Learning Gallery | The Steam",
-      contact: "Contact Us & Alternative Education Admissions | The Steam",
-      staff: "Staff Room Facilitators Portal | The Steam Bangalore",
+      home: "The Stream | Teacher Training Programs, Bangalore",
+      about: "About Us & J. Krishnamurti Philosophy | The Stream",
+      programs: "Alternative Educator Certification Programs | The Stream_NeeAr_TTP",
+      placement: "Alternative School Placements & Partners | The Stream Bangalore",
+      gallery: "Alternative Practical Learning Gallery | The Stream",
+      contact: "Contact Us & Alternative Education Admissions | The Stream",
+      staff: "Staff Room Facilitators Portal | The Stream Bangalore",
     };
-    document.title = titles[activeTab] || "The Steam — Teacher Training Programs, Bangalore";
+    document.title = titles[activeTab] || "The Stream — Teacher Training Programs, Bangalore";
   }, [activeTab]);
 
   const handleSetActiveTab = (tab: string) => {
@@ -110,6 +111,9 @@ export default function App() {
 
       {/* 🪵 Anchor Footer */}
       <Footer setActiveTab={handleSetActiveTab} />
+
+      {/* 💬 Live-Timing Conversational Chatbot */}
+      <ChatbotWidget />
     </div>
   );
 }

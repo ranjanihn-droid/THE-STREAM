@@ -1,5 +1,5 @@
 import { useState, useEffect, FormEvent } from "react";
-import { Lock, Unlock, User, Sparkles, BookOpen, FileText, ClipboardList, Send, LogOut, CheckCircle2, AlertCircle, Plus, Trash2, Calendar, FileDown, PlusCircle, Mail, Paperclip, Eye, Share2 } from "lucide-react";
+import { Lock, Unlock, User, Sparkles, BookOpen, FileText, ClipboardList, Send, LogOut, CheckCircle2, AlertCircle, Plus, Trash2, Calendar, FileDown, PlusCircle, Mail, Paperclip, Eye, Share2, MessageSquare } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
 interface NoticeItem {
@@ -37,7 +37,7 @@ export default function StaffPortalView() {
   const [currentUser, setCurrentUser] = useState<string>("");
 
   // Dashboard Tab state
-  const [dbTab, setDbTab] = useState<"notices" | "planner" | "placements" | "vault" | "enquiries">("notices");
+  const [dbTab, setDbTab] = useState<"notices" | "planner" | "placements" | "vault" | "enquiries" | "chatbot">("notices");
 
   // Load States
   const [notices, setNotices] = useState<NoticeItem[]>([]);
@@ -45,6 +45,9 @@ export default function StaffPortalView() {
   const [candidates, setCandidates] = useState<PlacingCandidate[]>([]);
   const [enquiries, setEnquiries] = useState<any[]>([]);
   const [isLoadingEnquiries, setIsLoadingEnquiries] = useState(false);
+  const [chatbotSessions, setChatbotSessions] = useState<any[]>([]);
+  const [isLoadingChatbot, setIsLoadingChatbot] = useState(false);
+  const [selectedChatSession, setSelectedChatSession] = useState<any>(null);
 
   // Form State for creating a Notice
   const [newNoticeTopic, setNewNoticeTopic] = useState("");
@@ -115,6 +118,63 @@ export default function StaffPortalView() {
       }
     } finally {
       setIsLoadingEnquiries(false);
+    }
+  };
+
+  const fetchChatbotSessions = async () => {
+    setIsLoadingChatbot(true);
+    try {
+      const response = await fetch("/api/staff/chatbot/sessions");
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && Array.isArray(data.sessions)) {
+          setChatbotSessions(data.sessions);
+        }
+      }
+    } catch (err) {
+      console.error("Error fetching chatbot sessions:", err);
+    } finally {
+      setIsLoadingChatbot(false);
+    }
+  };
+
+  const handleDeleteChatSession = async (id: string) => {
+    if (!window.confirm("Are you sure you want to delete this chatbot transcript? This cannot be undone.")) {
+      return;
+    }
+    try {
+      const response = await fetch(`/api/staff/chatbot/sessions/${id}`, {
+        method: "DELETE"
+      });
+      if (response.ok) {
+        setActionStatus("Chat session log deleted.");
+        setTimeout(() => setActionStatus(""), 4000);
+        if (selectedChatSession && selectedChatSession.id === id) {
+          setSelectedChatSession(null);
+        }
+        fetchChatbotSessions();
+      }
+    } catch (err) {
+      console.error("Failed to delete chat session:", err);
+    }
+  };
+
+  const handleClearAllChatSessions = async () => {
+    if (!window.confirm("CRITICAL WARNING: Are you sure you want to CLEAR ALL CHATBOT LOGS? This clears everything and is permanent!")) {
+      return;
+    }
+    try {
+      const response = await fetch("/api/staff/chatbot/clear-all", {
+        method: "POST"
+      });
+      if (response.ok) {
+        setActionStatus("All chatbot logs successfully cleared.");
+        setTimeout(() => setActionStatus(""), 4000);
+        setSelectedChatSession(null);
+        fetchChatbotSessions();
+      }
+    } catch (err) {
+      console.error("Failed to clear chatbot sessions:", err);
     }
   };
 
@@ -204,7 +264,11 @@ export default function StaffPortalView() {
 
   useEffect(() => {
     if (isLoggedIn) {
-      fetchEnquiries();
+      if (dbTab === "chatbot") {
+        fetchChatbotSessions();
+      } else {
+        fetchEnquiries();
+      }
     }
   }, [isLoggedIn, dbTab]);
 
@@ -596,7 +660,7 @@ Allow for silent pauses between responses. Focus on immediate self-observation.
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <h2 className="font-sketch text-3xl text-espresso">The Steam Staff Room</h2>
+                      <h2 className="font-sketch text-3xl text-espresso">The Stream Staff Room</h2>
                       <span className="bg-[#F37021] text-white px-2 py-0.5 rounded text-xs font-sans font-bold">Admin Portal</span>
                     </div>
                     <span className="font-hand text-lg text-slate-500 block">
@@ -675,6 +739,17 @@ Allow for silent pauses between responses. Focus on immediate self-observation.
                 >
                   <Mail className="w-5 h-5 shrink-0" />
                   <span>Admissions Enquiries ({enquiries.length})</span>
+                </button>
+                <button
+                  onClick={() => setDbTab("chatbot")}
+                  className={`px-5 py-3 rounded-t-lg font-sketch text-lg sm:text-xl border-x-2 border-t-2 border-transparent transition-all flex items-center gap-2 ${
+                    dbTab === "chatbot"
+                      ? "bg-white border-espresso/20 text-[#F37021] border-b-2 border-b-white -mb-[2px] font-bold"
+                      : "text-slate-500 hover:text-[#1A1D1C]"
+                  }`}
+                >
+                  <MessageSquare className="w-5 h-5 shrink-0 text-[#F37021]" />
+                  <span>Chatbot Logs & Backups ({chatbotSessions.length})</span>
                 </button>
               </div>
 
@@ -1469,6 +1544,176 @@ Allow for silent pauses between responses. Focus on immediate self-observation.
                       )}
 
                     </div>
+                  </div>
+                )}
+
+                {/* PAGE 6: CHATBOT MANAGER VIEW */}
+                {dbTab === "chatbot" && (
+                  <div className="space-y-8 animate-fadeIn">
+                    <div className="border-b border-gray-150 pb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                      <div>
+                        <h3 className="font-sketch text-2xl text-espresso flex items-center gap-2">
+                          Conversational Chatbot Dialogue & Offline Backup Records
+                        </h3>
+                        <p className="text-[#5A5C5A] text-md font-hand max-w-2xl font-semibold">
+                          Live tracking of learner chats. Enquiries outside 10:00 AM - 4:00 PM are automatically backed up as offline messages for coordination.
+                        </p>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        <button
+                          onClick={fetchChatbotSessions}
+                          disabled={isLoadingChatbot}
+                          className="px-4 py-2 bg-[#FAF9F6] border-2 border-dashed border-[#F37021]/60 hover:bg-[#F37021]/10 text-xs font-semibold text-espresso rounded transition-colors"
+                        >
+                          {isLoadingChatbot ? "Refreshing..." : "Refresh Logs"}
+                        </button>
+                        <a
+                          href="/api/staff/chatbot/download-backup"
+                          download="the_stream_chatbot_backup.json"
+                          className="px-4 py-2 bg-espresso text-stone-100 text-xs font-semibold rounded hover:bg-espresso/90 flex items-center gap-1 transition-all"
+                        >
+                          <FileDown className="w-4 h-4 text-[#F37021]" />
+                          Download Backup (JSON)
+                        </a>
+                        <button
+                          onClick={handleClearAllChatSessions}
+                          className="px-4 py-2 bg-rose-50 text-[#E11D48] border border-rose-200 text-xs font-semibold rounded hover:bg-rose-100 transition-colors"
+                        >
+                          Clear All Logs
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Action success notify bar */}
+                    {actionStatus && (
+                      <div className="bg-emerald-50 border-2 border-emerald-500/30 text-emerald-800 font-hand text-lg p-3 rounded-lg flex items-center gap-2 animate-fadeIn uppercase">
+                        <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+                        {actionStatus}
+                      </div>
+                    )}
+
+                    {chatbotSessions.length === 0 ? (
+                      <div className="text-center py-12 bg-[#FAF9F6] border-2 border-dashed border-espresso/15 rounded-xl">
+                        <MessageSquare className="w-12 h-12 text-[#F37021]/40 mx-auto mb-2" />
+                        <h4 className="font-sketch text-xl text-espresso">No Dialogues Stored Yet</h4>
+                        <p className="text-[#7F817F] font-hand text-lg mt-1">
+                          When visitors chat with The Stream's advisor, transcripts will populate here in real-time.
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                        {/* List of Chat Sessions (Left Column) */}
+                        <div className="lg:col-span-5 space-y-4 max-h-[600px] overflow-y-auto pr-2">
+                          <h4 className="font-sketch text-lg text-espresso border-b pb-1">
+                            Recorded Conversations ({chatbotSessions.length})
+                          </h4>
+                          {chatbotSessions.map((session) => (
+                            <div
+                              key={session.id}
+                              onClick={() => setSelectedChatSession(session)}
+                              className={`p-4 border-2 rounded-xl cursor-pointer transition-all ${
+                                selectedChatSession?.id === session.id
+                                  ? "border-[#F37021] bg-[#F37021]/5 shadow-sm"
+                                  : "border-[#1A1D1C]/15 bg-white hover:border-[#F37021]/40"
+                              }`}
+                            >
+                              <div className="flex justify-between items-start gap-2">
+                                <div className="space-y-1">
+                                  <div className="font-bold text-espresso text-sm flex items-center gap-1.5">
+                                    <span className="w-2 h-2 rounded-full bg-[#F37021]" />
+                                    {session.userName}
+                                  </div>
+                                  <div className="text-xs text-stone-500 font-mono truncate max-w-[200px]">
+                                    {session.userEmail}
+                                  </div>
+                                </div>
+                                <span className={`text-[9px] px-2 py-0.5 rounded-full font-bold uppercase ${
+                                  session.status === "active" 
+                                    ? "bg-emerald-50 text-emerald-700 border border-emerald-200" 
+                                    : "bg-amber-50 text-amber-700 border border-amber-200"
+                                }`}>
+                                  {session.status === "active" ? "Live Dialog" : "Offline Msg"}
+                                </span>
+                              </div>
+
+                              <div className="mt-3 pt-3 border-t border-dashed border-stone-100 flex justify-between items-center text-[10px] text-stone-500">
+                                <span>Started: {new Date(session.startedAt).toLocaleDateString()}</span>
+                                <span className="font-mono text-[9px] bg-stone-100 px-1.5 py-0.5 rounded text-stone-600">
+                                  {session.timingChecked}
+                                </span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Dialogue Transcript Panel (Right Column) */}
+                        <div className="lg:col-span-7">
+                          {selectedChatSession ? (
+                            <div className="border-2 border-[#1A1D1C] rounded-xl overflow-hidden bg-[#FAF9F6] flex flex-col h-[550px]">
+                              {/* Header */}
+                              <div className="bg-espresso text-stone-100 p-4 border-b border-espresso flex justify-between items-center">
+                                <div>
+                                  <div className="font-sketch text-lg text-[#F37021]">
+                                    Dialogue with {selectedChatSession.userName}
+                                  </div>
+                                  <div className="text-[10px] text-stone-300 font-mono">
+                                    Session ID: {selectedChatSession.id}
+                                  </div>
+                                </div>
+                                <button
+                                  onClick={() => handleDeleteChatSession(selectedChatSession.id)}
+                                  className="p-1.5 hover:bg-rose-500/20 text-rose-400 hover:text-rose-500 rounded transition-all"
+                                  title="Delete this chat transcript"
+                                >
+                                  <Trash2 className="w-4.5 h-4.5" />
+                                </button>
+                              </div>
+
+                              {/* Message History */}
+                              <div className="flex-grow p-4 space-y-4 overflow-y-auto">
+                                {selectedChatSession.messages && selectedChatSession.messages.map((m: any, index: number) => (
+                                  <div
+                                    key={index}
+                                    className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
+                                  >
+                                    <div
+                                      className={`max-w-[85%] rounded-lg px-4 py-2 text-sm ${
+                                        m.role === "user"
+                                          ? "bg-[#F37021] text-white rounded-br-none"
+                                          : "bg-white text-espresso border border-stone-200 shadow-sm rounded-bl-none"
+                                      }`}
+                                    >
+                                      <p className={m.role === "model" ? "font-hand text-md text-[#333333] leading-relaxed" : "leading-relaxed"}>
+                                        {m.content}
+                                      </p>
+                                      <span className="text-[9px] opacity-60 block mt-1 text-right">
+                                        {new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                      </span>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+
+                              {/* Metadata Panel */}
+                              <div className="bg-stone-100 p-3 border-t border-stone-200 text-xs space-y-1 font-mono text-stone-600">
+                                <div><strong className="text-espresso">Email:</strong> {selectedChatSession.userEmail}</div>
+                                <div><strong className="text-espresso">Started:</strong> {new Date(selectedChatSession.startedAt).toLocaleString()}</div>
+                                <div><strong className="text-espresso">Last Active:</strong> {new Date(selectedChatSession.lastActive).toLocaleString()}</div>
+                                <div><strong className="text-espresso">Captured Timing:</strong> {selectedChatSession.timingChecked}</div>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="border-2 border-dashed border-[#1A1D1C]/20 rounded-xl h-[550px] flex flex-col justify-center items-center text-center p-8 bg-white">
+                              <Sparkles className="w-10 h-10 text-[#F37021]/30 mb-2 animate-pulse" />
+                              <h4 className="font-sketch text-lg text-espresso">Select a recorded dialogue</h4>
+                              <p className="text-stone-500 font-hand text-md mt-1">
+                                Click any chat session on the left to inspect transcripts, user metadata, and captured contact leads.
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
 

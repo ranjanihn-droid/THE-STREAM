@@ -636,7 +636,7 @@ export default function GalleryView() {
                 <div className="md:w-2/5 p-8 sm:p-10 flex flex-col justify-between bg-white text-espresso">
                   <div>
                     <span className="text-[#F37021] font-amatic text-2xl font-bold tracking-widest uppercase mb-1 block">
-                      The Steam Experience
+                      The Stream Experience
                     </span>
                     <h3 className="font-sketch text-2xl sm:text-3xl text-espresso mt-1 mb-4">
                       {lightboxItem.title}

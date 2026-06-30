@@ -18,7 +18,7 @@ export default function Footer({ setActiveTab }: FooterProps) {
         <div className="md:col-span-5 flex flex-col justify-between">
           <div>
             <h4 className="font-sketch text-3xl text-[#F37021] tracking-wide mb-3">
-              The Steam
+              The Stream
             </h4>
             <span className="font-amatic text-sm text-[#5A5C5A] tracking-widest uppercase font-bold block mb-4">
               Educator Training Ground & Dialogue Hub
@@ -146,7 +146,7 @@ export default function Footer({ setActiveTab }: FooterProps) {
               Curriculum Facilitators
             </span>
             <div className="font-sketch text-sm text-[#1A1D1C] flex flex-col gap-0.5">
-              <span>The Steam Education Circle</span>
+              <span>The Stream Education Circle</span>
               <span className="font-hand text-xs text-[#5A5C5A] text-center">&amp;</span>
               <span>NeeAr team</span>
             </div>

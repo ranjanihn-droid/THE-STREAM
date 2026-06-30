@@ -2,9 +2,21 @@ import express from "express";
 import path from "path";
 import crypto from "crypto";
 import { createServer as createViteServer } from "vite";
+import { GoogleGenAI } from "@google/genai";
 
 // In-memory cache to store resolved OneDrive direct URLs so we only do the slow fetch once
 const resolvedCache = new Map<string, string>();
+
+let ai: GoogleGenAI | null = null;
+function getAI() {
+  if (!ai) {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (apiKey) {
+      ai = new GoogleGenAI({ apiKey });
+    }
+  }
+  return ai;
+}
 
 async function startServer() {
   const app = express();
@@ -434,6 +446,228 @@ Sitemap: https://www.thestream.co.in/sitemap.xml`);
       message: `Enquiry successfully forwarded to ${forwardEmail}.`,
       recipient: forwardEmail
     });
+  });
+
+  // --- CHATBOT IN-MEMORY LOGS & BACKUP API ENGINE ---
+  interface ChatMessage {
+    id: string;
+    role: "user" | "model" | "system";
+    content: string;
+    timestamp: string;
+  }
+
+  interface ChatSession {
+    id: string;
+    userName: string;
+    userEmail: string;
+    messages: ChatMessage[];
+    startedAt: string;
+    lastActive: string;
+    status: "active" | "offline_enquiry";
+    timingChecked: string;
+  }
+
+  const chatbotSessions: ChatSession[] = [
+    {
+      id: "chat-seed-1",
+      userName: "Nisha Rao",
+      userEmail: "nisha.rao@gmail.com",
+      startedAt: new Date(Date.now() - 3600000 * 3).toISOString(),
+      lastActive: new Date(Date.now() - 3600000 * 3 + 60000 * 5).toISOString(),
+      status: "active",
+      timingChecked: "Inside Hours (10am-4pm)",
+      messages: [
+        {
+          id: "m1",
+          role: "user",
+          content: "Hello, could you please tell me about the admissions process for the 12-month training program?",
+          timestamp: new Date(Date.now() - 3600000 * 3).toISOString()
+        },
+        {
+          id: "m2",
+          role: "model",
+          content: "Welcome to The Stream! Our 12-month Educator Certification Program is open for admissions. You can apply directly through our website by submitting your interest reflection under the Join Us page. Srini and our founding education coordinators will review your thoughts carefully.",
+          timestamp: new Date(Date.now() - 3600000 * 3 + 60000 * 2).toISOString()
+        }
+      ]
+    },
+    {
+      id: "chat-seed-2",
+      userName: "Karan Singh",
+      userEmail: "karan.singh@yahoo.com",
+      startedAt: new Date(Date.now() - 3600000 * 18).toISOString(),
+      lastActive: new Date(Date.now() - 3600000 * 18).toISOString(),
+      status: "offline_enquiry",
+      timingChecked: "Outside Hours (Offline)",
+      messages: [
+        {
+          id: "m3",
+          role: "user",
+          content: "Is there weekend accommodation for the J. Krishnamurti study retreats?",
+          timestamp: new Date(Date.now() - 3600000 * 18).toISOString()
+        },
+        {
+          id: "m4",
+          role: "model",
+          content: "Thank you for reaching out! Please note that we are currently offline (operating hours: 10:00 AM - 4:00 PM). Your enquiry has been received and backed up to our admissions team. We will get back to you via email shortly!",
+          timestamp: new Date(Date.now() - 3600000 * 18 + 1000).toISOString()
+        }
+      ]
+    }
+  ];
+
+  // Send message and get response (with timing check & lazy Gemini load)
+  app.post("/api/chatbot/message", async (req, res) => {
+    const { sessionId, userName, userEmail, content, forceOnline } = req.body;
+    
+    if (!sessionId || !content) {
+      return res.status(400).json({ error: "SessionId and content are required" });
+    }
+
+    // Determine Bangalore Timing (10 AM to 4 PM IST = GMT + 5:30)
+    const nowUtc = Date.now();
+    const serverDate = new Date(nowUtc);
+    const localOffset = serverDate.getTimezoneOffset(); // in minutes
+    // Convert current server time to UTC, then add 5.5 hours for IST
+    const istTime = new Date(nowUtc + (localOffset * 60000) + (5.5 * 3600000));
+    const hours = istTime.getHours();
+    
+    // Check if within 10:00 AM and 4:00 PM (hours 10 to 15, inclusive)
+    const isInsideTiming = hours >= 10 && hours < 16;
+    const timingChecked = (isInsideTiming || forceOnline) ? "Inside Hours (10am-4pm)" : "Outside Hours (Offline)";
+
+    // Find or create session
+    let session = chatbotSessions.find(s => s.id === sessionId);
+    if (!session) {
+      session = {
+        id: sessionId,
+        userName: userName ? String(userName).trim() : "Anonymous Learner",
+        userEmail: userEmail ? String(userEmail).trim() : "Not provided",
+        messages: [],
+        startedAt: new Date().toISOString(),
+        lastActive: new Date().toISOString(),
+        status: (isInsideTiming || forceOnline) ? "active" : "offline_enquiry",
+        timingChecked
+      };
+      chatbotSessions.push(session);
+    } else {
+      session.lastActive = new Date().toISOString();
+      if (userName) session.userName = String(userName).trim();
+      if (userEmail) session.userEmail = String(userEmail).trim();
+    }
+
+    // Add user message
+    const userMsg: ChatMessage = {
+      id: "msg-" + Date.now() + "-u",
+      role: "user",
+      content: String(content).trim(),
+      timestamp: new Date().toISOString()
+    };
+    session.messages.push(userMsg);
+
+    let modelReplyText = "";
+
+    // Respond according to timings
+    if (!isInsideTiming && !forceOnline) {
+      modelReplyText = `Thank you for your message! Please note that we are currently offline as our official timing is 10:00 AM to 4:00 PM. Your query has been recorded and safely backed up to our Admissions Console. A staff member will get back to you soon!`;
+      session.status = "offline_enquiry";
+    } else {
+      // Inside timings (or forced demo)
+      try {
+        const aiClient = getAI();
+        if (aiClient) {
+          console.log(`[Chatbot] Requesting Gemini (gemini-3.5-flash) for session ${sessionId}`);
+          
+          const systemPrompt = `You are the official Admissions & Dialogue Chatbot assistant for "The Stream", an immersive 12-month teacher preparation journey in Bangalore, India, in association with "NeeAr".
+The Stream believes in the philosophy of J. Krishnamurti (being your own teacher/disciple, freedom from comparison & competition).
+Our flagship 12-month Educator Certification Program is officially accredited by the prestigious M. P. Birla Institute of Fundamental Research.
+Our facilitators include Srini (Sreenivasan) and Murali.
+Current active placements include alternative schools such as Aranyaani (forest school) and Aarohi (democratic self-directed learning).
+Our operational timings for the chatbot are 10:00 AM to 4:00 PM.
+Keep your answers extremely warm, philosophical, helpful, and focused on self-observation and alternative education. Limit replies to 2-3 sentences.`;
+
+          const history = session.messages.slice(-6).map(m => ({
+            role: m.role === "user" ? "user" as const : "model" as const,
+            parts: [{ text: m.content }]
+          }));
+
+          const response = await aiClient.models.generateContent({
+            model: "gemini-3.5-flash",
+            contents: [
+              { role: "user", parts: [{ text: systemPrompt }] },
+              ...history
+            ]
+          });
+
+          modelReplyText = response.text || "I am reflecting deeply on your question. Could you clarify your interest in alternative schooling?";
+        } else {
+          // Fallback to beautiful rule-based replies using keyword matches
+          console.log(`[Chatbot] Gemini API key not found. Using Stream fallback logic.`);
+          const lowerMsg = String(content).toLowerCase();
+          if (lowerMsg.includes("admission") || lowerMsg.includes("apply") || lowerMsg.includes("join") || lowerMsg.includes("fee") || lowerMsg.includes("enroll")) {
+            modelReplyText = "Admissions for our 12-Month Educator Certification Program are open. You can apply by submitting your personal reflections on the 'Join Us' page. Our team (Srini and other coordinators) will review it and reach out within 3 business days.";
+          } else if (lowerMsg.includes("krishnamurti") || lowerMsg.includes("jk") || lowerMsg.includes("philosophy") || lowerMsg.includes("belief")) {
+            modelReplyText = "Our approach is deeply inspired by J. Krishnamurti, centering on observation without evaluation, learning about yourself, and freedom from comparison. We do not manufacture teachers to follow automated templates; we nurture conscious educators.";
+          } else if (lowerMsg.includes("placement") || lowerMsg.includes("school") || lowerMsg.includes("job") || lowerMsg.includes("work")) {
+            modelReplyText = "We actively place our certified educators in pioneering alternative schools, such as Aranyaani (a forest school) and Aarohi (a democratic self-directed learning community). Placements are fully integrated with our 12-month track.";
+          } else if (lowerMsg.includes("timing") || lowerMsg.includes("hour") || lowerMsg.includes("time") || lowerMsg.includes("open") || lowerMsg.includes("schedule")) {
+            modelReplyText = "Our live chatbot support operates strictly from 10:00 AM to 4:00 PM. Outside of these hours, your enquiries are safely logged and stored in our database for staff review.";
+          } else if (lowerMsg.includes("accredit") || lowerMsg.includes("birla") || lowerMsg.includes("certificate")) {
+            modelReplyText = "Our flagship 12-Month Educator Certification is officially accredited in joint association with the prestigious M. P. Birla Institute of Fundamental Research in Bangalore, ensuring high standards of observation and academic rigor.";
+          } else {
+            modelReplyText = "Thank you for sharing your resonance with The Stream. We explore Right Education, self-observation, and unhurried learning. Would you like to know more about our 12-Month program, our school placements, or our J. Krishnamurti philosophical foundations?";
+          }
+        }
+      } catch (err: any) {
+        console.error("[Chatbot Gemini Error] Falling back to standard replies:", err.message);
+        modelReplyText = "I am deeply observing your query. We appreciate your resonance with our 12-month program. Our team will review your message and connect with you shortly.";
+      }
+    }
+
+    // Add model reply
+    const modelMsg: ChatMessage = {
+      id: "msg-" + Date.now() + "-m",
+      role: "model",
+      content: modelReplyText,
+      timestamp: new Date().toISOString()
+    };
+    session.messages.push(modelMsg);
+
+    res.json({
+      success: true,
+      messages: session.messages,
+      isInsideTiming,
+      timingChecked
+    });
+  });
+
+  // Fetch all chatbot sessions (Admin)
+  app.get("/api/staff/chatbot/sessions", (req, res) => {
+    res.json({ success: true, sessions: [...chatbotSessions].reverse() });
+  });
+
+  // Delete a chatbot session (Admin)
+  app.delete("/api/staff/chatbot/sessions/:id", (req, res) => {
+    const { id } = req.params;
+    const idx = chatbotSessions.findIndex(s => s.id === id);
+    if (idx !== -1) {
+      chatbotSessions.splice(idx, 1);
+      return res.json({ success: true, message: "Chatbot session deleted from logs." });
+    }
+    res.status(404).json({ error: "Session not found" });
+  });
+
+  // Clear all chatbot sessions (Admin)
+  app.post("/api/staff/chatbot/clear-all", (req, res) => {
+    chatbotSessions.length = 0;
+    res.json({ success: true, message: "All chatbot logs successfully cleared." });
+  });
+
+  // Download Backup (JSON) file response
+  app.get("/api/staff/chatbot/download-backup", (req, res) => {
+    res.setHeader("Content-disposition", "attachment; filename=the_stream_chatbot_backup.json");
+    res.setHeader("Content-type", "application/json");
+    res.send(JSON.stringify(chatbotSessions, null, 2));
   });
 
   // Secure Staff Login endpoint comparing incoming credentials with secure hashes
